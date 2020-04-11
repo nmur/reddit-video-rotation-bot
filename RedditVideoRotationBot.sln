@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditVideoRotationBot", "src\RedditVideoRotationBot\RedditVideoRotationBot.csproj", "{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditVideoRotationBot", "src\RedditVideoRotationBot\RedditVideoRotationBot.csproj", "{06D9552D-F06D-4C32-9821-8F168FEC4885}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D9552D-F06D-4C32-9821-8F168FEC4885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D9552D-F06D-4C32-9821-8F168FEC4885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D9552D-F06D-4C32-9821-8F168FEC4885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D9552D-F06D-4C32-9821-8F168FEC4885}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
