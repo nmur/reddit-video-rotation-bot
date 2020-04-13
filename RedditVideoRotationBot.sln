@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditVideoRotationBot", "src\RedditVideoRotationBot\RedditVideoRotationBot.csproj", "{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedditVideoRotationBot", "src\RedditVideoRotationBot\RedditVideoRotationBot.csproj", "{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A17DEA4B-CC84-4D27-B409-4AF3D62C017E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tst", "tst", "{D19266BC-B712-4B2A-ACFD-0FCD6CA996AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RedditVideoRotationBotTests", "tst\unit\RedditVideoRotationBotTests\RedditVideoRotationBotTests.csproj", "{6FC05381-45A9-460E-827A-406088FA552F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "unit", "unit", "{3026112C-E44E-4241-ABF0-1D86FAC7D252}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +23,18 @@ Global
 		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FC05381-45A9-460E-827A-406088FA552F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FC05381-45A9-460E-827A-406088FA552F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FC05381-45A9-460E-827A-406088FA552F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FC05381-45A9-460E-827A-406088FA552F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{53C985E7-DA92-4E3D-9D30-DB302E4F0D0F} = {A17DEA4B-CC84-4D27-B409-4AF3D62C017E}
+		{6FC05381-45A9-460E-827A-406088FA552F} = {3026112C-E44E-4241-ABF0-1D86FAC7D252}
+		{3026112C-E44E-4241-ABF0-1D86FAC7D252} = {D19266BC-B712-4B2A-ACFD-0FCD6CA996AF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {32835A8D-BAFE-41D1-9988-1B5783337140}
