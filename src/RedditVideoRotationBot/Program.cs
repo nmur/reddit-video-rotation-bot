@@ -2,17 +2,16 @@
 
 namespace RedditVideoRotationBot
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             var counter = 0;
-            var max = args.Length != 0 ? Convert.ToInt32(args[0]) : -1;
-            while (max == -1 || counter < max)
+            while (counter < int.MaxValue)
             {
                 counter++;
-                Console.WriteLine($"Counter: {counter}");
-                System.Threading.Tasks.Task.Delay(10000).Wait();
+                Console.WriteLine($"Counter: {counter}!!!");
+                System.Threading.Tasks.Task.Delay(5000).Wait();
             }
         }
     }
