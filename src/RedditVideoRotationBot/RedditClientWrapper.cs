@@ -17,6 +17,7 @@ namespace RedditVideoRotationBot
                 redditClientConfiguration.GetRefreshToken(),
                 redditClientConfiguration.GetAppSecret());
             Console.WriteLine($"RedditClient created for user: {_redditClient.Account.Me.Name}");
+            System.Threading.Thread.Sleep(1000*60*60*24); // sleep for a day to prevent loops, for now.
         }
     }
 }
