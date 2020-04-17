@@ -1,4 +1,4 @@
-﻿namespace RedditVideoRotationBot
+﻿namespace RedditVideoRotationBot.Interfaces
 {
     public interface IRedditClientConfiguration
     {
