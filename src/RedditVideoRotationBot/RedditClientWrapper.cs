@@ -1,4 +1,6 @@
 ﻿using Reddit;
+using Reddit.Controllers;
+using Reddit.Controllers.EventArgs;
 using System;
 using System.Diagnostics.CodeAnalysis;
 
@@ -17,7 +19,25 @@ namespace RedditVideoRotationBot
                 redditClientConfiguration.GetRefreshToken(),
                 redditClientConfiguration.GetAppSecret());
             Console.WriteLine($"RedditClient created for user: {_redditClient.Account.Me.Name}");
-            System.Threading.Thread.Sleep(1000*60*60*24); // sleep for a day to prevent loops, for now.
+        }
+
+        public event EventHandler<MessagesUpdateEventArgs> UnreadUpdated;
+
+        public void MonitorUnread()
+        {
+            MonitorUnreadMessages(_redditClient.Account.Messages);
+        }
+
+        // This method deals with https://github.com/sirkris/Reddit.NET/issues/105
+        private void MonitorUnreadMessages(PrivateMessages messages)
+        {
+            messages.MonitorUnread();
+            messages.UnreadUpdated += InvokeUnreadUpdatedEvent;
+        }
+
+        private void InvokeUnreadUpdatedEvent(object sender, MessagesUpdateEventArgs e)
+        {
+            UnreadUpdated.Invoke(sender, e);
         }
     }
 }
