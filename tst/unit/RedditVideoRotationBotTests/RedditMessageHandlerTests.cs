@@ -49,6 +49,48 @@ namespace RedditVideoRotationBotTests
             Assert.Equal(1, redditMessageHandler.TempUserMentionCount);
         }
 
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenUsernameMentionsWereHandled()
+        {
+            // Arrange
+            var redditMessageHandler = new RedditMessageHandler();
+            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
+
+            // Act
+            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            Assert.Equal(2, redditMessageHandler.TempUserMentionCount);
+        }
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionWasHandled()
+        {
+            // Arrange
+            var redditMessageHandler = new RedditMessageHandler();
+            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage();
+
+            // Act
+            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            Assert.Equal(1, redditMessageHandler.TempUserMentionCount);
+        }
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithOneMessageNotAUsernameMention_ThenNoUsernameMentionWasHandled()
+        {
+            // Arrange
+            var redditMessageHandler = new RedditMessageHandler();
+            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage();
+
+            // Act
+            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            Assert.Equal(0, redditMessageHandler.TempUserMentionCount);
+        }
+
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()
         {
             return new MessagesUpdateEventArgs
@@ -65,6 +107,36 @@ namespace RedditVideoRotationBotTests
             };
         }
 
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> {
+                    GetUsernameMentionMessage(),
+                    GetUsernameMentionMessage()
+                }
+            };
+        }
+
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> {
+                    GetUsernameMentionMessage(),
+                    GetNonUsernameMentionMessage()
+                }
+            };
+        }
+
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetNonUsernameMentionMessage() }
+            };
+        }
+
         private static Message GetUsernameMentionMessage()
         {
             return new Message
@@ -72,6 +144,16 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true
+            };
+        }
+
+        private static Message GetNonUsernameMentionMessage()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "hey!",
+                WasComment = false
             };
         }
     }
