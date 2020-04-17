@@ -15,7 +15,8 @@ namespace RedditVideoRotationBot
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
 
-            serviceProvider.GetService<IRedditClientWrapper>();
+            var redditHelper = new RedditHelper(serviceProvider.GetService<IRedditClientWrapper>());
+            redditHelper.MonitorUnreadMessages();
         }
 
         private static IServiceCollection ConfigureServices()
@@ -24,11 +25,7 @@ namespace RedditVideoRotationBot
 
             var config = LoadConfiguration();
             services.AddSingleton(config);
-
-            var redditClientConfiguration = new RedditClientConfiguration(
-                config["RedditClient:AppId"],
-                config["RedditClient:AppSecret"],
-                config["RedditClient:RefreshToken"]);
+            var redditClientConfiguration = GetRedditClientSegmentFromConfiguration(config);
 
             Console.WriteLine($"redditClientConfiguration.GetAppId: {redditClientConfiguration.GetAppId()}");
 
@@ -46,6 +43,14 @@ namespace RedditVideoRotationBot
                 .AddEnvironmentVariables();
 
             return builder.Build();
+        }
+
+        private static RedditClientConfiguration GetRedditClientSegmentFromConfiguration(IConfiguration config)
+        {
+            return new RedditClientConfiguration(
+                config["RedditClient:AppId"],
+                config["RedditClient:AppSecret"],
+                config["RedditClient:RefreshToken"]);
         }
     }
 }
