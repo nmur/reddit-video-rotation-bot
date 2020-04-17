@@ -1,4 +1,5 @@
 using FakeItEasy;
+using Reddit.Controllers.EventArgs;
 using RedditVideoRotationBot;
 using RedditVideoRotationBot.Interfaces;
 using Xunit;
@@ -28,6 +29,20 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.MonitorUnread()).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public void GivenRedditHelperIsMonitoringUnreadMessages_WhenNewUnreadMessageArrives_ThenMessagesHandlerMethodIsExecuted()
+        {
+            // Arrange
+            _redditHelper.MonitorUnreadMessages();
+
+            // Act
+            _fakeRedditClientWrapper.UnreadUpdated += Raise.With(e: new MessagesUpdateEventArgs());
+
+            // Assert
+            A.CallTo(() => _fakeRedditMessageHandler.OnUnreadMessagesUpdated(A<object>._, A<MessagesUpdateEventArgs>._))
+             .MustHaveHappenedOnceExactly();
         }
     }
 }
