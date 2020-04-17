@@ -1,6 +1,7 @@
 ﻿using Reddit;
 using Reddit.Controllers;
 using Reddit.Controllers.EventArgs;
+using RedditVideoRotationBot.Interfaces;
 using System;
 using System.Diagnostics.CodeAnalysis;
 

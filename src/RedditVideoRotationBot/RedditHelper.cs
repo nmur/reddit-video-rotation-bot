@@ -1,26 +1,23 @@
-﻿using Reddit.Controllers.EventArgs;
-using System;
+﻿using RedditVideoRotationBot.Interfaces;
 
 namespace RedditVideoRotationBot
 {
     public class RedditHelper
     {
-        private readonly IRedditClientWrapper RedditClientWrapper;
+        private readonly IRedditClientWrapper _redditClientWrapper;
 
-        public RedditHelper(IRedditClientWrapper redditClientWrapper)
+        private readonly IRedditMessageHandler _redditMessageHandler;
+
+        public RedditHelper(IRedditClientWrapper redditClientWrapper, IRedditMessageHandler redditMessageHandler)
         {
-            RedditClientWrapper = redditClientWrapper;
+            _redditClientWrapper = redditClientWrapper;
+            _redditMessageHandler = redditMessageHandler;
         }
 
         public void MonitorUnreadMessages()
         {
-            RedditClientWrapper.UnreadUpdated += OnUnreadMessagesUpdated;
-            RedditClientWrapper.MonitorUnread();
-        }
-
-        private void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
-        {
-            Console.WriteLine($"Message received from {e.NewMessages[0].Author}");
+            _redditClientWrapper.UnreadUpdated += _redditMessageHandler.OnUnreadMessagesUpdated;
+            _redditClientWrapper.MonitorUnread();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RedditVideoRotationBot.Interfaces;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -15,7 +16,9 @@ namespace RedditVideoRotationBot
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
 
-            var redditHelper = new RedditHelper(serviceProvider.GetService<IRedditClientWrapper>());
+            var redditHelper = new RedditHelper(
+                serviceProvider.GetService<IRedditClientWrapper>(),
+                serviceProvider.GetService<IRedditMessageHandler>());
             redditHelper.MonitorUnreadMessages();
 
             System.Threading.Thread.Sleep(1000 * 60 * 60 * 24);
@@ -32,6 +35,7 @@ namespace RedditVideoRotationBot
             Console.WriteLine($"redditClientConfiguration.GetAppId: {redditClientConfiguration.GetAppId()}");
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
+            services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddTransient<IRedditClientWrapper, RedditClientWrapper>();
 
             return services;

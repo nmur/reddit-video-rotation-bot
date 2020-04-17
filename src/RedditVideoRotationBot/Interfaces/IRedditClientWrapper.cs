@@ -1,7 +1,7 @@
 ﻿using Reddit.Controllers.EventArgs;
 using System;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Interfaces
 {
     public interface IRedditClientWrapper
     {
