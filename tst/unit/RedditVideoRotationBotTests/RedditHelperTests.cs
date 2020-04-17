@@ -6,25 +6,24 @@ namespace RedditVideoRotationBotTests
 {
     public class RedditHelperTests
     {
-        [Fact]
-        public void WhenRedditHelperIsConstructed_ThenNoExceptionIsThrown()
+        readonly IRedditClientWrapper _fakeRedditClientWrapper;
+
+        readonly RedditHelper _redditHelper;
+
+        public RedditHelperTests()
         {
-            var fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
-            new RedditHelper(fakeRedditClientWrapper);
+            _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
+            _redditHelper = new RedditHelper(_fakeRedditClientWrapper);
         }
 
         [Fact]
         public void GivenRedditHelper_WhenMonitorUnreadMessagesIsCalled_ThenUnreadMessagesAreMonitored()
         {
-            // Arrange
-            var fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
-            var redditHelper = new RedditHelper(fakeRedditClientWrapper);
-
             // Act
-            redditHelper.MonitorUnreadMessages();
+            _redditHelper.MonitorUnreadMessages();
 
             // Assert
-            A.CallTo(() => fakeRedditClientWrapper.MonitorUnread()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.MonitorUnread()).MustHaveHappenedOnceExactly();
         }
     }
 }
