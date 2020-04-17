@@ -17,6 +17,8 @@ namespace RedditVideoRotationBot
 
             var redditHelper = new RedditHelper(serviceProvider.GetService<IRedditClientWrapper>());
             redditHelper.MonitorUnreadMessages();
+
+            System.Threading.Thread.Sleep(1000 * 60 * 60 * 24);
         }
 
         private static IServiceCollection ConfigureServices()
