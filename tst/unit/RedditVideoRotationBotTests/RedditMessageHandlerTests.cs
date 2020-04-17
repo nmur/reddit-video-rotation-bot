@@ -1,6 +1,7 @@
 ﻿using Reddit.Controllers.EventArgs;
 using Reddit.Things;
 using RedditVideoRotationBot;
+using RedditVideoRotationBot.Interfaces;
 using System.Collections.Generic;
 using Xunit;
 
@@ -8,87 +9,69 @@ namespace RedditVideoRotationBotTests
 {
     public class RedditMessageHandlerTests
     {
-        [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithAnEmptyMessage_ThenNoUsernameMentionsWereHandled()
-        {
-            // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
+        private readonly IRedditMessageHandler _redditMessageHandler;
 
+        public RedditMessageHandlerTests()
+        {
+            _redditMessageHandler = new RedditMessageHandler();
+        }
+
+        [Theory]
+        [MemberData(nameof(MessagesUpdateEventArgsWithNoValidUsernameMentions))]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithNoValidUsernameMentions_ThenNoUsernameMentionsWereHandled(MessagesUpdateEventArgs messagesUpdateEventArgs)
+        {
             // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), new MessagesUpdateEventArgs());
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(0, redditMessageHandler.TempUserMentionCount);
+            Assert.Equal(0, _redditMessageHandler.TempUserMentionCount);
+        }
+
+        public static IEnumerable<object[]> MessagesUpdateEventArgsWithNoValidUsernameMentions =>
+            new List<object[]>
+            {
+                new object[] { new MessagesUpdateEventArgs() },
+                new object[] { GetMessageUpdateEventArgsWithNoMessages() },
+                new object[] { GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage() }
+            };
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+
+            // Act
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithNoMessages_ThenNoUsernameMentionsWereHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenUsernameMentionsWereHandled()
         {
             // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
-            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessageUpdateEventArgsWithNoMessages();
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
 
             // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(0, redditMessageHandler.TempUserMentionCount);
+            Assert.Equal(2, _redditMessageHandler.TempUserMentionCount);
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionWasHandled()
         {
             // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
-            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage();
 
             // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(1, redditMessageHandler.TempUserMentionCount);
-        }
-
-        [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenUsernameMentionsWereHandled()
-        {
-            // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
-            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
-
-            // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            Assert.Equal(2, redditMessageHandler.TempUserMentionCount);
-        }
-
-        [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionWasHandled()
-        {
-            // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
-            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage();
-
-            // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            Assert.Equal(1, redditMessageHandler.TempUserMentionCount);
-        }
-
-        [Fact]
-        public void GivenRedditMessageHandler_WhenOneUnreadMessagesUpdatedIsCalledWithOneMessageNotAUsernameMention_ThenNoUsernameMentionWasHandled()
-        {
-            // Arrange
-            var redditMessageHandler = new RedditMessageHandler();
-            MessagesUpdateEventArgs messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage();
-
-            // Act
-            redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            Assert.Equal(0, redditMessageHandler.TempUserMentionCount);
+            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()

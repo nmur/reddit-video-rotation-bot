@@ -9,7 +9,7 @@ namespace RedditVideoRotationBot
     {
         private const string UsernameMentionSubjectString = "username mention";
 
-        public int TempUserMentionCount; //TODO: remove this count once we have a state that's testable 
+        public int TempUserMentionCount { get; private set; } //TODO: remove this count once we have a state that's testable 
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
         {
