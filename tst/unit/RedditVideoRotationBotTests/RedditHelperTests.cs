@@ -8,11 +8,11 @@ namespace RedditVideoRotationBotTests
 {
     public class RedditHelperTests
     {
-        readonly IRedditClientWrapper _fakeRedditClientWrapper;
+        private readonly IRedditClientWrapper _fakeRedditClientWrapper;
 
-        readonly IRedditMessageHandler _fakeRedditMessageHandler;
+        private readonly IRedditMessageHandler _fakeRedditMessageHandler;
 
-        readonly RedditHelper _redditHelper;
+        private readonly RedditHelper _redditHelper;
 
         public RedditHelperTests()
         {

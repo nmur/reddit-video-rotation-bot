@@ -2,7 +2,6 @@
 
 namespace RedditVideoRotationBot
 {
-
     public class RedditClientConfiguration : IRedditClientConfiguration
     {
         private readonly string AppId;
