@@ -10,6 +10,14 @@ namespace RedditVideoRotationBotTests
 {
     public class RedditMessageHandlerTests
     {
+        private const string UsernameMentionId = "xyzxyz";
+
+        private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
+
+        private const string MessageId = "abcabc";
+
+        private const string MessageFullname = "t4_" + MessageId;
+
         private readonly IRedditClientWrapper _fakeRedditClientWrapper;
 
         private readonly IRedditMessageHandler _redditMessageHandler;
@@ -28,7 +36,7 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(0, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustNotHaveHappened();
         }
 
         public static IEnumerable<object[]> MessagesUpdateEventArgsWithNoValidUsernameMentions =>
@@ -36,8 +44,20 @@ namespace RedditVideoRotationBotTests
             {
                 new object[] { new MessagesUpdateEventArgs() },
                 new object[] { GetMessageUpdateEventArgsWithNoMessages() },
-                new object[] { GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage() }
             };
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneNonUsernameMentionMessage_ThenMessageWasHandled()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage();
+
+            // Act
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(MessageFullname)).MustHaveHappenedOnceExactly();
+        }
 
         [Fact]
         public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
@@ -49,11 +69,11 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenUsernameMentionsWereHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenTwoUsernameMentionsWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
@@ -62,11 +82,11 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(2, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionWasHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionAndOneOtherMessageWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage();
@@ -75,20 +95,8 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
-        }
-
-        [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneMessage_ThenMessageWasMarkedAsRead()
-        {
-            // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-
-            // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(MessageFullname)).MustHaveHappenedOnceExactly();
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()
@@ -143,7 +151,8 @@ namespace RedditVideoRotationBotTests
             {
                 Author = "test-user",
                 Subject = "username mention",
-                WasComment = true
+                WasComment = true,
+                Id = UsernameMentionId
             };
         }
 
@@ -153,7 +162,8 @@ namespace RedditVideoRotationBotTests
             {
                 Author = "test-user",
                 Subject = "hey!",
-                WasComment = false
+                WasComment = false,
+                Id = MessageId
             };
         }
     }

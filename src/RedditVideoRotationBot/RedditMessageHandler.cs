@@ -2,7 +2,6 @@
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
 using System;
-using System.Collections.Generic;
 
 namespace RedditVideoRotationBot
 {
@@ -11,8 +10,6 @@ namespace RedditVideoRotationBot
         private readonly IRedditClientWrapper _redditClientWrapper;
 
         private const string UsernameMentionSubjectString = "username mention";
-
-        public int TempUserMentionCount { get; private set; } //TODO: remove this count once we have a state that's testable 
 
         public RedditMessageHandler(IRedditClientWrapper redditClientWrapper)
         {
@@ -29,20 +26,27 @@ namespace RedditVideoRotationBot
 
                 if (MessageIsUsernameMention(message))
                 {
-                    TempUserMentionCount++;
                     Console.WriteLine($"Message was a user mention");
-                    _redditClientWrapper.ReadMessage(message.Name); // User mentions seem to require the t1_x name instead for this API
                 }
-                else
-                {
-                    _redditClientWrapper.ReadMessage(message.Fullname);
-                }
+
+                MarkMessageAsRead(message);
             }
         }
 
         private static bool MessageIsUsernameMention(Message message)
         {
             return message.Subject == UsernameMentionSubjectString && message.WasComment;
+        }
+
+        private void MarkMessageAsRead(Message message)
+        {
+            _redditClientWrapper.ReadMessage(GetMessageFullname(message));
+        }
+
+        private static string GetMessageFullname(Message message)
+        {
+            // User mentions/comments seem to require the t1_x name instead for the read_message API
+            return (message.WasComment ? "t1_" : "t4_") + message.Id;
         }
     }
 }
