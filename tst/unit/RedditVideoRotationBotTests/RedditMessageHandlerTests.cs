@@ -3,17 +3,21 @@ using Reddit.Things;
 using RedditVideoRotationBot;
 using RedditVideoRotationBot.Interfaces;
 using System.Collections.Generic;
+using FakeItEasy;
 using Xunit;
 
 namespace RedditVideoRotationBotTests
 {
     public class RedditMessageHandlerTests
     {
+        private readonly IRedditClientWrapper _fakeRedditClientWrapper;
+
         private readonly IRedditMessageHandler _redditMessageHandler;
 
         public RedditMessageHandlerTests()
         {
-            _redditMessageHandler = new RedditMessageHandler();
+            _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper);
         }
 
         [Theory]
@@ -72,6 +76,19 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
+        }
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneMessage_ThenMessageWasMarkedAsRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+
+            // Act
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessages()).MustHaveHappenedOnceExactly();
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()
