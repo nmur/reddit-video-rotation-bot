@@ -8,5 +8,7 @@ namespace RedditVideoRotationBot.Interfaces
         event EventHandler<MessagesUpdateEventArgs> UnreadUpdated;
 
         void MonitorUnread();
+
+        void ReadMessage(string id);
     }
 }

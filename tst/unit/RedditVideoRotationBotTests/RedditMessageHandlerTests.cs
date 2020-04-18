@@ -3,17 +3,33 @@ using Reddit.Things;
 using RedditVideoRotationBot;
 using RedditVideoRotationBot.Interfaces;
 using System.Collections.Generic;
+using FakeItEasy;
 using Xunit;
 
 namespace RedditVideoRotationBotTests
 {
     public class RedditMessageHandlerTests
     {
+        private const string UsernameMentionId = "xyzxyz";
+
+        private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
+
+        private const string PrivateMessageId = "abcabc";
+
+        private const string PrivateMessageFullname = "t4_" + PrivateMessageId;
+
+        private const string CommentReplyId = "abcabc";
+
+        private const string CommentReplyFullname = "t4_" + CommentReplyId;
+
+        private readonly IRedditClientWrapper _fakeRedditClientWrapper;
+
         private readonly IRedditMessageHandler _redditMessageHandler;
 
         public RedditMessageHandlerTests()
         {
-            _redditMessageHandler = new RedditMessageHandler();
+            _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper);
         }
 
         [Theory]
@@ -24,7 +40,7 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(0, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustNotHaveHappened();
         }
 
         public static IEnumerable<object[]> MessagesUpdateEventArgsWithNoValidUsernameMentions =>
@@ -32,8 +48,20 @@ namespace RedditVideoRotationBotTests
             {
                 new object[] { new MessagesUpdateEventArgs() },
                 new object[] { GetMessageUpdateEventArgsWithNoMessages() },
-                new object[] { GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage() }
             };
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOnePrivateMessage_ThenMessageWasHandled()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage();
+
+            // Act
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+        }
 
         [Fact]
         public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
@@ -45,11 +73,11 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenUsernameMentionsWereHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenTwoUsernameMentionsWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
@@ -58,20 +86,36 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(2, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOneOtherMessage_ThenOneUsernameMentionWasHandled()
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOnePrivateMessage_ThenOneUsernameMentionAndOnePrivateMessageWereHandled()
         {
             // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage();
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOnePrivateMessage();
 
             // Act
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            Assert.Equal(1, _redditMessageHandler.TempUserMentionCount);
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+        }
+
+        [Fact]
+        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithAMixOfMessages_ThenMessagesWereHandled()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithAMixOfMessages();
+
+            // Act
+            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(CommentReplyFullname)).MustHaveHappenedOnceExactly();
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()
@@ -101,13 +145,25 @@ namespace RedditVideoRotationBotTests
             };
         }
 
-        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOneOtherMessage()
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOnePrivateMessage()
         {
             return new MessagesUpdateEventArgs
             {
                 NewMessages = new List<Message> {
                     GetUsernameMentionMessage(),
-                    GetNonUsernameMentionMessage()
+                    GetPrivateMessage()
+                }
+            };
+        }
+
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithAMixOfMessages()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> {
+                    GetUsernameMentionMessage(),
+                    GetPrivateMessage(),
+                    GetCommentReplyMessage()
                 }
             };
         }
@@ -116,7 +172,7 @@ namespace RedditVideoRotationBotTests
         {
             return new MessagesUpdateEventArgs
             {
-                NewMessages = new List<Message> { GetNonUsernameMentionMessage() }
+                NewMessages = new List<Message> { GetPrivateMessage() }
             };
         }
 
@@ -126,17 +182,30 @@ namespace RedditVideoRotationBotTests
             {
                 Author = "test-user",
                 Subject = "username mention",
-                WasComment = true
+                WasComment = true,
+                Id = UsernameMentionId
             };
         }
 
-        private static Message GetNonUsernameMentionMessage()
+        private static Message GetPrivateMessage()
         {
             return new Message
             {
                 Author = "test-user",
                 Subject = "hey!",
-                WasComment = false
+                WasComment = false,
+                Id = PrivateMessageId
+            };
+        }
+
+        private static Message GetCommentReplyMessage()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "comment reply",
+                WasComment = true,
+                Id = CommentReplyId
             };
         }
     }

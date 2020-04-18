@@ -29,6 +29,11 @@ namespace RedditVideoRotationBot
             MonitorUnreadMessages(_redditClient.Account.Messages);
         }
 
+        public void ReadMessage(string id)
+        {
+            _redditClient.Account.Messages.ReadMessage(id);
+        }
+
         // This method deals with https://github.com/sirkris/Reddit.NET/issues/105
         private void MonitorUnreadMessages(PrivateMessages messages)
         {
