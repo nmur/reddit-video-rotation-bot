@@ -88,7 +88,7 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessages()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustHaveHappenedOnceExactly();
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()

@@ -36,7 +36,7 @@ namespace RedditVideoRotationBot
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
-            services.AddTransient<IRedditClientWrapper, RedditClientWrapper>();
+            services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();
 
             return services;
         }
