@@ -10,7 +10,13 @@ namespace RedditVideoRotationBot
     [ExcludeFromCodeCoverage]
     public static class Program
     {
+#pragma warning disable RCS1018 // Add accessibility modifiers.
+#pragma warning disable RCS1163 // Unused parameter.
+#pragma warning disable IDE0060 // Remove unused parameter
         static void Main(string[] args)
+#pragma warning restore IDE0060 // Remove unused parameter
+#pragma warning restore RCS1163 // Unused parameter.
+#pragma warning restore RCS1018 // Add accessibility modifiers.
         {
             Console.WriteLine($"Starting...");
             var services = ConfigureServices();
@@ -21,7 +27,7 @@ namespace RedditVideoRotationBot
                 serviceProvider.GetService<IRedditMessageHandler>());
             redditHelper.MonitorUnreadMessages();
 
-            System.Threading.Thread.Sleep(1000 * 60 * 60 * 24);
+            System.Threading.Thread.Sleep(1000 * 60 * 60 * 72);
         }
 
         private static IServiceCollection ConfigureServices()
