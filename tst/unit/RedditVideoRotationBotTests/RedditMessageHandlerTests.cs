@@ -74,8 +74,9 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(1);
+            AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
         }
 
         [Fact]
@@ -88,8 +89,9 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
+            AssertNumberOfReadMessages(2);
+            AssertNumberOfRepliedToComments(2);
+            AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
         }
 
         [Fact]
@@ -102,10 +104,10 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(PrivateMessageFullname)).MustNotHaveHappened();
+            AssertNumberOfReadMessages(2);
+            AssertNumberOfRepliedToComments(1);
+            AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
+            AssertOnePrivateMessageWasMarkedRead();
         }
 
         [Fact]
@@ -118,12 +120,45 @@ namespace RedditVideoRotationBotTests
             _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
+            AssertNumberOfReadMessages(3);
+            AssertNumberOfRepliedToComments(1);
+            AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
+            AssertOnePrivateMessageWasMarkedRead();
+            AssertOneCommentReplyWasMarkedRead();
+        }
+
+        private void AssertOneUsernameMentionWasMarkedReadAndRepliedTo()
+        {
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+        }
+
+        private void AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo()
+        {
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
+        }
+
+        private void AssertOnePrivateMessageWasMarkedRead()
+        {
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(PrivateMessageFullname)).MustNotHaveHappened();
+        }
+
+        private void AssertOneCommentReplyWasMarkedRead()
+        {
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(CommentReplyFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(CommentReplyFullname)).MustNotHaveHappened();
+        }
+
+        private void AssertNumberOfReadMessages(int times)
+        {
+            A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustHaveHappened(times, Times.Exactly);
+        }
+
+        private void AssertNumberOfRepliedToComments(int times)
+        {
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(A<string>._)).MustHaveHappened(times, Times.Exactly);
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()
