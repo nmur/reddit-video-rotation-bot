@@ -10,5 +10,7 @@ namespace RedditVideoRotationBot.Interfaces
         void MonitorUnread();
 
         void ReadMessage(string id);
+
+        void ReplyToComment(string id);
     }
 }
