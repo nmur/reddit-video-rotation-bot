@@ -41,6 +41,7 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(A<string>._)).MustNotHaveHappened();
         }
 
         public static IEnumerable<object[]> MessagesUpdateEventArgsWithNoValidUsernameMentions =>
@@ -74,6 +75,7 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -87,6 +89,7 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -100,7 +103,9 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(PrivateMessageFullname)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -114,8 +119,11 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(UsernameMentionFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(PrivateMessageFullname)).MustNotHaveHappened();
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(CommentReplyFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeRedditClientWrapper.ReplyToComment(CommentReplyFullname)).MustNotHaveHappened();
         }
 
         private static MessagesUpdateEventArgs GetMessageUpdateEventArgsWithNoMessages()

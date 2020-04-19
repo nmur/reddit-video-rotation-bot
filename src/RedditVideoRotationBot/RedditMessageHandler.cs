@@ -27,6 +27,7 @@ namespace RedditVideoRotationBot
                 if (MessageIsUsernameMention(message))
                 {
                     Console.WriteLine($"Message was a user mention");
+                    _redditClientWrapper.ReplyToComment(GetMessageFullname(message));
                 }
 
                 MarkMessageAsRead(message);
@@ -41,6 +42,7 @@ namespace RedditVideoRotationBot
         private void MarkMessageAsRead(Message message)
         {
             _redditClientWrapper.ReadMessage(GetMessageFullname(message));
+            Console.WriteLine($"Message was marked as read");
         }
 
         private static string GetMessageFullname(Message message)
