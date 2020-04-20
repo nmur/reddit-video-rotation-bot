@@ -2,6 +2,8 @@
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
 using System;
+using System.IO;
+using System.Net;
 
 namespace RedditVideoRotationBot
 {
@@ -9,11 +11,14 @@ namespace RedditVideoRotationBot
     {
         private readonly IRedditClientWrapper _redditClientWrapper;
 
+        private readonly IVideoDownloader _videoDownloader;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader)
         {
             _redditClientWrapper = redditClientWrapper;
+            _videoDownloader = videoDownloader;
         }
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -24,11 +29,16 @@ namespace RedditVideoRotationBot
             {
                 Console.WriteLine($"Message received from {message.Author}");
 
-                if (MessageIsUsernameMention(message))
+                if (MessageIsUsernameMention(message)) //TODO: refactor this body when scope and form becomes more apparent
                 {
                     Console.WriteLine($"Message was a user mention");
                     string videoUrl = RedditPostParser.TryGetVideoUrlFromPost(GetCommentRootPost(message));
                     Console.WriteLine($"videoUrl: {videoUrl}");
+
+                    //delete video file if there's one already. only process one file at a time for now
+                    DeleteVideoFileIfPresent();
+
+                    _videoDownloader.DownloadFromUrl(videoUrl);
 
                     ReplyToComment(message);
                 }
@@ -51,6 +61,14 @@ namespace RedditVideoRotationBot
         {
             _redditClientWrapper.ReadMessage(GetMessageFullname(message));
             Console.WriteLine($"Message was marked as read");
+        }
+
+        private static void DeleteVideoFileIfPresent()
+        {
+            if (File.Exists("video.mp4"))
+            {
+                File.Delete("video.mp4");
+            }
         }
 
         private void ReplyToComment(Message message)

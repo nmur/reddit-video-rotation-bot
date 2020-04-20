@@ -23,9 +23,13 @@ namespace RedditVideoRotationBotTests
 
         private const string CommentReplyFullname = "t1_" + CommentReplyId;
 
+        private const string VideoUrlString = "https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback";
+
         private const string MediaString = "{\"reddit_video\":{\"fallback_url\":\"https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback\",\"height\":1080,\"width\":608,\"scrubber_media_url\":\"https://v.redd.it/abcabcabcabc/DASH_96\",\"dash_url\":\"https://v.redd.it/abcabcabcabc/DASHPlaylist.mpd\",\"duration\":8,\"hls_url\":\"https://v.redd.it/abcabcabcabc/HLSPlaylist.m3u8\",\"is_gif\":false,\"transcoding_status\":\"completed\"}}";
 
         private readonly IRedditClientWrapper _fakeRedditClientWrapper;
+
+        private readonly IVideoDownloader _fakeVideoDownloader;
 
         private readonly IRedditMessageHandler _redditMessageHandler;
 
@@ -33,7 +37,8 @@ namespace RedditVideoRotationBotTests
         {
             _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
             SetupCommentRootPostStubs();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper);
+            _fakeVideoDownloader = A.Fake<IVideoDownloader>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader);
         }
 
         [Theory]
@@ -81,6 +86,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -96,6 +102,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(2);
             AssertNumberOfRepliedToComments(2);
             AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -112,6 +119,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -129,13 +137,24 @@ namespace RedditVideoRotationBotTests
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
             AssertOneCommentReplyWasMarkedRead();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
         }
 
         private void SetupCommentRootPostStubs()
         {
-            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(new Reddit.Controllers.Post(null, new Post { Media = JObject.Parse(MediaString) }));
-            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(new Reddit.Controllers.Post(null, new Post()));
-            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(new Reddit.Controllers.Post(null, new Post { Media = JObject.Parse(MediaString) }));
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(GetPostWithNoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
+        }
+
+        private static Reddit.Controllers.Post GetPostWithVideoMedia()
+        {
+            return new Reddit.Controllers.Post(null, new Post { Media = JObject.Parse(MediaString) });
+        }
+
+        private static Reddit.Controllers.Post GetPostWithNoMedia()
+        {
+            return new Reddit.Controllers.Post(null, new Post());
         }
 
         private void AssertOneUsernameMentionWasMarkedReadAndRepliedTo()

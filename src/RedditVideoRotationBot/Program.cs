@@ -41,6 +41,7 @@ namespace RedditVideoRotationBot
             Console.WriteLine($"redditClientConfiguration.GetAppId: {redditClientConfiguration.GetAppId()}");
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
+            services.AddSingleton<IVideoDownloader, VideoDownloader>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();
 
