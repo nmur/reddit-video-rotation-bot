@@ -27,6 +27,9 @@ namespace RedditVideoRotationBot
                 if (MessageIsUsernameMention(message))
                 {
                     Console.WriteLine($"Message was a user mention");
+                    string videoUrl = RedditPostParser.TryGetVideoUrlFromPost(GetCommentRootPost(message));
+                    Console.WriteLine($"videoUrl: {videoUrl}");
+
                     ReplyToComment(message);
                 }
 
@@ -37,6 +40,11 @@ namespace RedditVideoRotationBot
         private static bool MessageIsUsernameMention(Message message)
         {
             return message.Subject == UsernameMentionSubjectString && message.WasComment;
+        }
+
+        private Post GetCommentRootPost(Message message)
+        {
+            return _redditClientWrapper.GetCommentRootPost(GetMessageFullname(message)).Listing;
         }
 
         private void MarkMessageAsRead(Message message)

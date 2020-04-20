@@ -39,6 +39,11 @@ namespace RedditVideoRotationBot
             _redditClient.Comment(id).Reply("pong");
         }
 
+        public Post GetCommentRootPost(string id)
+        {
+            return _redditClient.Comment(id).GetRoot(id);
+        }
+
         // This method deals with https://github.com/sirkris/Reddit.NET/issues/105
         private void MonitorUnreadMessages(PrivateMessages messages)
         {
