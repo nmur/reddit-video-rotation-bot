@@ -20,7 +20,7 @@ namespace RedditVideoRotationBotTests
 
         private const string CommentReplyId = "abcabc";
 
-        private const string CommentReplyFullname = "t4_" + CommentReplyId;
+        private const string CommentReplyFullname = "t1_" + CommentReplyId;
 
         private readonly IRedditClientWrapper _fakeRedditClientWrapper;
 
