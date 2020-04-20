@@ -1,4 +1,5 @@
-﻿using Reddit.Controllers.EventArgs;
+﻿using Reddit.Controllers;
+using Reddit.Controllers.EventArgs;
 using System;
 
 namespace RedditVideoRotationBot.Interfaces
@@ -12,5 +13,7 @@ namespace RedditVideoRotationBot.Interfaces
         void ReadMessage(string id);
 
         void ReplyToComment(string id);
+
+        Post GetCommentRootPost(string id);
     }
 }
