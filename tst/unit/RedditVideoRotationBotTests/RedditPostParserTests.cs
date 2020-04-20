@@ -26,5 +26,34 @@ namespace RedditVideoRotationBotTests
             // Assert
             Assert.Equal(VideoUrlString, url);
         }
+
+        [Fact]
+        public void GivenRedditPostWithNoVideo_WhenVideoUrlIsParsedFromPost_ThenEmptyStringIsReturned()
+        {
+            // Arrange
+            var post = new Post();
+
+            // Act
+            var url = RedditPostParser.TryGetVideoUrlFromPost(post);
+
+            // Assert
+            Assert.Equal("", url);
+        }
+
+        [Fact]
+        public void GivenRedditPostWithNonVideoMedia_WhenVideoUrlIsParsedFromPost_ThenEmptyStringIsReturned()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse("{\"some_other_media\":{\"data\":\"value\"}}")
+            };
+
+            // Act
+            var url = RedditPostParser.TryGetVideoUrlFromPost(post);
+
+            // Assert
+            Assert.Equal("", url);
+        }
     }
 }

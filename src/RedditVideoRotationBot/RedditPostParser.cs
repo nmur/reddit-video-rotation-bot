@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit.Things;
+using System;
 
 namespace RedditVideoRotationBot
 {
@@ -8,9 +9,17 @@ namespace RedditVideoRotationBot
     {
         public static string TryGetVideoUrlFromPost(Post post)
         {
-            var mediaJObject = (JObject)post.Media;
-            var media = mediaJObject.ToObject<Media>();
-            return media.RedditVideo.FallbackUrl;
+            try
+            {
+                var mediaJObject = (JObject)post.Media;
+                var media = mediaJObject.ToObject<Media>();
+                return media.RedditVideo.FallbackUrl;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("No video found in post");
+                return "";
+            }
         }
     }
 
