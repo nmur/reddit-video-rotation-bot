@@ -1,6 +1,7 @@
 ﻿using Reddit;
 using Reddit.Controllers;
 using Reddit.Controllers.EventArgs;
+using Reddit.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -36,7 +37,14 @@ namespace RedditVideoRotationBot
 
         public void ReplyToComment(string id)
         {
-            _redditClient.Comment(id).Reply("pong");
+            try
+            {
+                _redditClient.Comment(id).Reply("pong");
+            }
+            catch (RedditRateLimitException)
+            {
+                Console.WriteLine("Reddit's reply rate limit was exceeded!");
+            }
         }
 
         public Post GetCommentRootPost(string id)
