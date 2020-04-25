@@ -13,12 +13,15 @@ namespace RedditVideoRotationBot
 
         private readonly IVideoDownloader _videoDownloader;
 
+        private readonly IVideoRotator _videoRotator;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
+            _videoRotator = videoRotator;
         }
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -36,41 +39,10 @@ namespace RedditVideoRotationBot
                     Console.WriteLine($"videoUrl: {videoUrl}");
 
                     //delete video file if there's one already. only process one file at a time for now
-                    DeleteVideoFileIfPresent();
+                    DeleteVideoFilesIfPresent();
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
-
-                    // rotate video test
-                    if (File.Exists("video.mp4"))
-                    {
-                        Console.WriteLine($"video.mp4 found");
-                        System.Diagnostics.Process proc = new System.Diagnostics.Process
-                        {
-                            StartInfo = new System.Diagnostics.ProcessStartInfo
-                            {
-                                FileName = "ffmpeg",
-                                Arguments = "-i video.mp4 -c copy -metadata:s:v:0 rotate=90 video_rotated.mp4",
-                                UseShellExecute = false,
-                                RedirectStandardOutput = true,
-                                RedirectStandardError = true
-                            }
-                        };
-                    
-                        Console.WriteLine($"Starting video rotation...");
-                        proc.Start();
-                        Console.WriteLine($"Started video rotation, waiting for process to complete...");
-                        proc.WaitForExit();
-                        Console.WriteLine($"Process complete with exit code: {proc.ExitCode}");
-                    }
-
-                    if (File.Exists("video_rotated.mp4"))
-                    {
-                        Console.WriteLine($"video rotated successfully!");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"ERROR: video rotated unsuccessfully!");
-                    }
+                    _videoRotator.Rotate();
 
                     ReplyToComment(message);
                 }
@@ -95,11 +67,15 @@ namespace RedditVideoRotationBot
             Console.WriteLine($"Message was marked as read");
         }
 
-        private static void DeleteVideoFileIfPresent()
+        private static void DeleteVideoFilesIfPresent()
         {
             if (File.Exists("video.mp4"))
             {
                 File.Delete("video.mp4");
+            }
+            if (File.Exists("video_rotated.mp4"))
+            {
+                File.Delete("video_rotated.mp4");
             }
         }
 

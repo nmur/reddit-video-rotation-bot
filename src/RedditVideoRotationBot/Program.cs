@@ -42,6 +42,7 @@ namespace RedditVideoRotationBot
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
             services.AddSingleton<IVideoDownloader, VideoDownloader>();
+            services.AddSingleton<IVideoRotator, VideoRotator>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();
 
