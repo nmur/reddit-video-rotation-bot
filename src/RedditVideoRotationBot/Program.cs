@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedditVideoRotationBot.Interfaces;
+using Refit;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -39,6 +40,8 @@ namespace RedditVideoRotationBot
             var redditClientConfiguration = GetRedditClientSegmentFromConfiguration(config);
 
             Console.WriteLine($"redditClientConfiguration.GetAppId: {redditClientConfiguration.GetAppId()}");
+
+            services.AddRefitClient<IGfyCatApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.gfycat.com"));
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
             services.AddSingleton<IVideoDownloader, VideoDownloader>();

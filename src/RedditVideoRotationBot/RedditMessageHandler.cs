@@ -15,13 +15,16 @@ namespace RedditVideoRotationBot
 
         private readonly IVideoRotator _videoRotator;
 
+        private readonly IGfyCatApi _gfyCatApi;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IGfyCatApi gfyCatApi)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _videoRotator = videoRotator;
+            _gfyCatApi = gfyCatApi;
         }
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -41,8 +44,15 @@ namespace RedditVideoRotationBot
                     //delete video file if there's one already. only process one file at a time for now
                     DeleteVideoFilesIfPresent();
 
-                    _videoDownloader.DownloadFromUrl(videoUrl);
-                    _videoRotator.Rotate();
+                    //_videoDownloader.DownloadFromUrl(videoUrl);
+                    //_videoRotator.Rotate();
+
+                    var token = _gfyCatApi.GetAuthToken(new GfyCatCredentials
+                    {
+                        GrantType = "client_credentials",
+                        ClientId = "",
+                        ClientSecret = ""
+                    }).GetAwaiter().GetResult().AccessToken;
 
                     ReplyToComment(message);
                 }
