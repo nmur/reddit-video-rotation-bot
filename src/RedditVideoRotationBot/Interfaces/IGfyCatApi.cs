@@ -38,6 +38,13 @@ namespace RedditVideoRotationBot.Interfaces
         public bool IsOk { get; set; }
 
         [JsonProperty("gfyname")]
-        public string Gfyname { get; set; }
+        public string GfyName { get; set; }
+    }
+
+    public interface IGfyCatFileDropApi
+    {
+        [Multipart]
+        [Post("")]
+        Task<ApiResponse<string>> UploadVideoFromFile([AliasAs("key")] string key, [AliasAs("file")] StreamPart stream);
     }
 }

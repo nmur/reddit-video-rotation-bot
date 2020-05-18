@@ -1,9 +1,13 @@
 ﻿using Reddit.Controllers.EventArgs;
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
+using Refit;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Reflection;
 
 namespace RedditVideoRotationBot
 {
@@ -17,14 +21,17 @@ namespace RedditVideoRotationBot
 
         private readonly IGfyCatApi _gfyCatApi;
 
+        private readonly IGfyCatFileDropApi _gfyCatFileDropApi;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IGfyCatApi gfyCatApi)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IGfyCatApi gfyCatApi, IGfyCatFileDropApi gfyCatFileDropApi)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _videoRotator = videoRotator;
             _gfyCatApi = gfyCatApi;
+            _gfyCatFileDropApi = gfyCatFileDropApi;
         }
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -44,7 +51,7 @@ namespace RedditVideoRotationBot
                     //delete video file if there's one already. only process one file at a time for now
                     DeleteVideoFilesIfPresent();
 
-                    //_videoDownloader.DownloadFromUrl(videoUrl);
+                    _videoDownloader.DownloadFromUrl(videoUrl);
                     //_videoRotator.Rotate();
 
                     var token = _gfyCatApi.GetAuthToken(new GfyCatCredentials
@@ -56,9 +63,13 @@ namespace RedditVideoRotationBot
 
                     var gfyCreationResponse = _gfyCatApi.CreateGfy($"Bearer {token}").GetAwaiter().GetResult();
 
-                    if (gfyCreationResponse.IsOk)
+                    if (gfyCreationResponse.IsOk && File.Exists("video.mp4"))
                     {
+                        File.Move("video.mp4", gfyCreationResponse.GfyName);
 
+                        using var stream = File.OpenRead(gfyCreationResponse.GfyName);
+
+                        var response = _gfyCatFileDropApi.UploadVideoFromFile(gfyCreationResponse.GfyName, new StreamPart(stream, gfyCreationResponse.GfyName)).GetAwaiter().GetResult();
                     }
 
                     ReplyToComment(message);
