@@ -54,6 +54,13 @@ namespace RedditVideoRotationBot
                         ClientSecret = ""
                     }).GetAwaiter().GetResult().AccessToken;
 
+                    var gfyCreationResponse = _gfyCatApi.CreateGfy($"Bearer {token}").GetAwaiter().GetResult();
+
+                    if (gfyCreationResponse.IsOk)
+                    {
+
+                    }
+
                     ReplyToComment(message);
                 }
 

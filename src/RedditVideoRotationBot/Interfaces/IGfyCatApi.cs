@@ -6,8 +6,12 @@ namespace RedditVideoRotationBot.Interfaces
 {
     public interface IGfyCatApi
     {
-        [Post("/v1/oauth/token")]
+        [Post("/oauth/token")]
         Task<GfyCatTokenResponse> GetAuthToken([Body] GfyCatCredentials gfyCatCredentials);
+
+
+        [Post("/gfycats")]
+        Task<GfyCreationResponse> CreateGfy([Header("Authorization")] string authorization);
     }
 
     public class GfyCatCredentials
@@ -26,5 +30,14 @@ namespace RedditVideoRotationBot.Interfaces
     {
         [JsonProperty("access_token")]
         public string AccessToken { get; set; }
+    }
+
+    public class GfyCreationResponse
+    {
+        [JsonProperty("isOk")]
+        public bool IsOk { get; set; }
+
+        [JsonProperty("gfyname")]
+        public string Gfyname { get; set; }
     }
 }
