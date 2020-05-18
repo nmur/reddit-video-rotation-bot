@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using System.Threading;
 
 namespace RedditVideoRotationBot
 {
@@ -52,7 +53,7 @@ namespace RedditVideoRotationBot
                     DeleteVideoFilesIfPresent();
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
-                    //_videoRotator.Rotate();
+                    _videoRotator.Rotate();
 
                     var token = _gfyCatApi.GetAuthToken(new GfyCatCredentials
                     {
@@ -61,15 +62,27 @@ namespace RedditVideoRotationBot
                         ClientSecret = ""
                     }).GetAwaiter().GetResult().AccessToken;
 
-                    var gfyCreationResponse = _gfyCatApi.CreateGfy($"Bearer {token}").GetAwaiter().GetResult();
+                    Console.WriteLine($"Got token: {token}");
 
-                    if (gfyCreationResponse.IsOk && File.Exists("video.mp4"))
+                    var gfyCreationResponse = _gfyCatApi.CreateGfy($"Bearer {token}").GetAwaiter().GetResult();
+                    Console.WriteLine($"IsOk: {gfyCreationResponse.IsOk}");
+                    Console.WriteLine($"Gfyname: {gfyCreationResponse.GfyName}");
+
+                    if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4"))
                     {
-                        File.Move("video.mp4", gfyCreationResponse.GfyName);
+                        Console.WriteLine($"video_rotated.mp4 found ");
+                        File.Move("video_rotated.mp4", gfyCreationResponse.GfyName);
+                        Console.WriteLine($"renamed to: {gfyCreationResponse.GfyName}");
 
                         using var stream = File.OpenRead(gfyCreationResponse.GfyName);
+                        Console.WriteLine($"stream created with length: {stream.Length}");
 
-                        var response = _gfyCatFileDropApi.UploadVideoFromFile(gfyCreationResponse.GfyName, new StreamPart(stream, gfyCreationResponse.GfyName)).GetAwaiter().GetResult();
+                        _gfyCatFileDropApi.UploadVideoFromFile(gfyCreationResponse.GfyName, new StreamPart(stream, gfyCreationResponse.GfyName)).GetAwaiter().GetResult();
+                        Console.WriteLine($"Video upload initiated...");
+                        Thread.Sleep(10000);
+                        var response = _gfyCatApi.GetGfyStatus(gfyCreationResponse.GfyName).GetAwaiter().GetResult();
+                        Console.WriteLine($"Reuploaded video task status: {response.Task}");
+                        Console.WriteLine($"Reuploaded video URL: {response.Mp4Url}");
                     }
 
                     ReplyToComment(message);

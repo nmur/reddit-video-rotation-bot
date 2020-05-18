@@ -9,9 +9,11 @@ namespace RedditVideoRotationBot.Interfaces
         [Post("/oauth/token")]
         Task<GfyCatTokenResponse> GetAuthToken([Body] GfyCatCredentials gfyCatCredentials);
 
-
         [Post("/gfycats")]
         Task<GfyCreationResponse> CreateGfy([Header("Authorization")] string authorization);
+
+        [Get("/gfycats/fetch/status/{gfyName}")]
+        Task<GfyStatusResponse> GetGfyStatus(string gfyName);
     }
 
     public class GfyCatCredentials
@@ -45,6 +47,15 @@ namespace RedditVideoRotationBot.Interfaces
     {
         [Multipart]
         [Post("")]
-        Task<ApiResponse<string>> UploadVideoFromFile([AliasAs("key")] string key, [AliasAs("file")] StreamPart stream);
+        Task UploadVideoFromFile([AliasAs("key")] string key, [AliasAs("file")] StreamPart stream);
+    }
+
+    public class GfyStatusResponse
+    {
+        [JsonProperty("mp4Url")]
+        public string Mp4Url { get; set; }
+
+        [JsonProperty("task")]
+        public string Task { get; set; }
     }
 }
