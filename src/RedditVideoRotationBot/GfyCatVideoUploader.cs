@@ -13,10 +13,13 @@ namespace RedditVideoRotationBot
 
         private readonly IGfyCatFileDropApi _gfyCatFileDropApi;
 
-        public GfyCatVideoUploader(IGfyCatApi gfyCatApi, IGfyCatFileDropApi gfyCatFileDropApi)
+        private readonly IGfyCatApiConfiguration _gfyCatApiConfiguration;
+
+        public GfyCatVideoUploader(IGfyCatApi gfyCatApi, IGfyCatFileDropApi gfyCatFileDropApi, IGfyCatApiConfiguration gfyCatApiConfiguration)
         {
             _gfyCatApi = gfyCatApi;
             _gfyCatFileDropApi = gfyCatFileDropApi;
+            _gfyCatApiConfiguration = gfyCatApiConfiguration;
         }
 
         public async Task UploadAsync()
@@ -35,8 +38,8 @@ namespace RedditVideoRotationBot
             var gfyCatTokenResponse = await _gfyCatApi.GetAuthToken(new GfyCatCredentials
             {
                 GrantType = "client_credentials",
-                ClientId = "",
-                ClientSecret = ""
+                ClientId = _gfyCatApiConfiguration.GetClientId(),
+                ClientSecret = _gfyCatApiConfiguration.GetClientSecret()
             });
             return gfyCatTokenResponse.AccessToken;
         }
