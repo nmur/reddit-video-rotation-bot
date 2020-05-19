@@ -30,10 +30,10 @@ namespace RedditVideoRotationBot
             var token = gfyCatTokenResponse.AccessToken;
 
             var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}");
-            Console.WriteLine($"Gfyname: {gfyCreationResponse.GfyName}");
 
             if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4"))
             {
+                Console.WriteLine($"Gfyname: {gfyCreationResponse.GfyName}");
                 File.Move("video_rotated.mp4", gfyCreationResponse.GfyName);
 
                 using var stream = File.OpenRead(gfyCreationResponse.GfyName);
