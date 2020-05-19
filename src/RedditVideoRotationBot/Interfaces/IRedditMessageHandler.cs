@@ -1,9 +1,10 @@
 ﻿using Reddit.Controllers.EventArgs;
+using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot.Interfaces
 {
     public interface IRedditMessageHandler
     {
-        void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e);
+        Task OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e);
     }
 }

@@ -7,6 +7,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+[assembly: CollectionBehavior(DisableTestParallelization = true)] //until we get unique video file names
 
 namespace RedditVideoRotationBotTests
 {

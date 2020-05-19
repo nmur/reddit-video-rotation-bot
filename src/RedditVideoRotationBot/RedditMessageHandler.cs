@@ -3,6 +3,7 @@ using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot
 {
@@ -26,7 +27,7 @@ namespace RedditVideoRotationBot
             _videoUploader = videoUploader;
         }
 
-        public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
+        public async Task OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
         {
             if (e == null || e.NewMessages == null) return;
 
@@ -45,7 +46,7 @@ namespace RedditVideoRotationBot
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
                     _videoRotator.Rotate();
-                    _videoUploader.UploadAsync().GetAwaiter().GetResult();
+                    await _videoUploader.UploadAsync();
 
                     ReplyToComment(message);
                 }
