@@ -45,6 +45,7 @@ namespace RedditVideoRotationBot
             services.AddRefitClient<IGfyCatFileDropApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://filedrop.gfycat.com"));
 
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
+            services.AddSingleton<IVideoUploader, GfyCatVideoUploader>();
             services.AddSingleton<IVideoDownloader, VideoDownloader>();
             services.AddSingleton<IVideoRotator, VideoRotator>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();

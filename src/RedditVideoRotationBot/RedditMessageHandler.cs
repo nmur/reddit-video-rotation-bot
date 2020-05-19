@@ -1,14 +1,8 @@
 ﻿using Reddit.Controllers.EventArgs;
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
-using Refit;
 using System;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Reflection;
-using System.Threading;
 
 namespace RedditVideoRotationBot
 {
@@ -20,19 +14,16 @@ namespace RedditVideoRotationBot
 
         private readonly IVideoRotator _videoRotator;
 
-        private readonly IGfyCatApi _gfyCatApi;
-
-        private readonly IGfyCatFileDropApi _gfyCatFileDropApi;
+        private readonly IVideoUploader _videoUploader;
 
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IGfyCatApi gfyCatApi, IGfyCatFileDropApi gfyCatFileDropApi)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _videoRotator = videoRotator;
-            _gfyCatApi = gfyCatApi;
-            _gfyCatFileDropApi = gfyCatFileDropApi;
+            _videoUploader = videoUploader;
         }
 
         public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -54,36 +45,7 @@ namespace RedditVideoRotationBot
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
                     _videoRotator.Rotate();
-
-                    var token = _gfyCatApi.GetAuthToken(new GfyCatCredentials
-                    {
-                        GrantType = "client_credentials",
-                        ClientId = "",
-                        ClientSecret = ""
-                    }).GetAwaiter().GetResult().AccessToken;
-
-                    Console.WriteLine($"Got token: {token}");
-
-                    var gfyCreationResponse = _gfyCatApi.CreateGfy($"Bearer {token}").GetAwaiter().GetResult();
-                    Console.WriteLine($"IsOk: {gfyCreationResponse.IsOk}");
-                    Console.WriteLine($"Gfyname: {gfyCreationResponse.GfyName}");
-
-                    if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4"))
-                    {
-                        Console.WriteLine($"video_rotated.mp4 found ");
-                        File.Move("video_rotated.mp4", gfyCreationResponse.GfyName);
-                        Console.WriteLine($"renamed to: {gfyCreationResponse.GfyName}");
-
-                        using var stream = File.OpenRead(gfyCreationResponse.GfyName);
-                        Console.WriteLine($"stream created with length: {stream.Length}");
-
-                        _gfyCatFileDropApi.UploadVideoFromFile(gfyCreationResponse.GfyName, new StreamPart(stream, gfyCreationResponse.GfyName)).GetAwaiter().GetResult();
-                        Console.WriteLine($"Video upload initiated...");
-                        Thread.Sleep(10000);
-                        var response = _gfyCatApi.GetGfyStatus(gfyCreationResponse.GfyName).GetAwaiter().GetResult();
-                        Console.WriteLine($"Reuploaded video task status: {response.Task}");
-                        Console.WriteLine($"Reuploaded video URL: {response.Mp4Url}");
-                    }
+                    _videoUploader.UploadAsync().GetAwaiter().GetResult();
 
                     ReplyToComment(message);
                 }

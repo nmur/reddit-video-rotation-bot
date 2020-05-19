@@ -35,9 +35,7 @@ namespace RedditVideoRotationBotTests
 
         private readonly IRedditMessageHandler _redditMessageHandler;
 
-        private readonly IGfyCatApi _fakeGfyCatApi;
-
-        private readonly IGfyCatFileDropApi _fakeGfyCatFileDropApi;
+        private readonly IVideoUploader _fakeGfyCatVideoUploader;
 
         public RedditMessageHandlerTests()
         {
@@ -45,7 +43,8 @@ namespace RedditVideoRotationBotTests
             SetupCommentRootPostStubs();
             _fakeVideoDownloader = A.Fake<IVideoDownloader>();
             _fakeVideoRotator = A.Fake<IVideoRotator>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeVideoRotator, _fakeGfyCatApi, _fakeGfyCatFileDropApi);
+            _fakeGfyCatVideoUploader = A.Fake<IVideoUploader>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeVideoRotator, _fakeGfyCatVideoUploader);
         }
 
         [Theory]
