@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedditVideoRotationBot.Interfaces;
+using Refit;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -37,10 +38,16 @@ namespace RedditVideoRotationBot
             var config = LoadConfiguration();
             services.AddSingleton(config);
             var redditClientConfiguration = GetRedditClientSegmentFromConfiguration(config);
+            var gfyCatApiConfiguration = GetGfyCatApiSegmentFromConfiguration(config);
 
             Console.WriteLine($"redditClientConfiguration.GetAppId: {redditClientConfiguration.GetAppId()}");
 
+            services.AddRefitClient<IGfyCatApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.gfycat.com/v1"));
+            services.AddRefitClient<IGfyCatFileDropApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://filedrop.gfycat.com"));
+
             services.AddSingleton<IRedditClientConfiguration>(redditClientConfiguration);
+            services.AddSingleton<IGfyCatApiConfiguration>(gfyCatApiConfiguration);
+            services.AddSingleton<IVideoUploader, GfyCatVideoUploader>();
             services.AddSingleton<IVideoDownloader, VideoDownloader>();
             services.AddSingleton<IVideoRotator, VideoRotator>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
@@ -65,6 +72,13 @@ namespace RedditVideoRotationBot
                 config["RedditClient:AppId"],
                 config["RedditClient:AppSecret"],
                 config["RedditClient:RefreshToken"]);
+        }
+
+        private static GfyCatApiConfiguration GetGfyCatApiSegmentFromConfiguration(IConfiguration config)
+        {
+            return new GfyCatApiConfiguration(
+                config["GfyCatApi:ClientId"],
+                config["GfyCatApi:ClientSecret"]);
         }
     }
 }

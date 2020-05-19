@@ -3,7 +3,7 @@ using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
 using System;
 using System.IO;
-using System.Net;
+using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot
 {
@@ -15,16 +15,19 @@ namespace RedditVideoRotationBot
 
         private readonly IVideoRotator _videoRotator;
 
+        private readonly IVideoUploader _videoUploader;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _videoRotator = videoRotator;
+            _videoUploader = videoUploader;
         }
 
-        public void OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
+        public async Task OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
         {
             if (e == null || e.NewMessages == null) return;
 
@@ -43,6 +46,7 @@ namespace RedditVideoRotationBot
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
                     _videoRotator.Rotate();
+                    await _videoUploader.UploadAsync();
 
                     ReplyToComment(message);
                 }

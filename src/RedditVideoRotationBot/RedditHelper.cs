@@ -16,7 +16,7 @@ namespace RedditVideoRotationBot
 
         public void MonitorUnreadMessages()
         {
-            _redditClientWrapper.UnreadUpdated += _redditMessageHandler.OnUnreadMessagesUpdated;
+            _redditClientWrapper.UnreadUpdated += async (s, e) => await _redditMessageHandler.OnUnreadMessagesUpdated(s, e);
             _redditClientWrapper.MonitorUnread();
         }
     }

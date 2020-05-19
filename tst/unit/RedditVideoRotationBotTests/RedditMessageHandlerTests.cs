@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using FakeItEasy;
 using Xunit;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace RedditVideoRotationBotTests
 {
@@ -35,21 +36,24 @@ namespace RedditVideoRotationBotTests
 
         private readonly IRedditMessageHandler _redditMessageHandler;
 
+        private readonly IVideoUploader _fakeGfyCatVideoUploader;
+
         public RedditMessageHandlerTests()
         {
             _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
             SetupCommentRootPostStubs();
             _fakeVideoDownloader = A.Fake<IVideoDownloader>();
             _fakeVideoRotator = A.Fake<IVideoRotator>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeVideoRotator);
+            _fakeGfyCatVideoUploader = A.Fake<IVideoUploader>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeVideoRotator, _fakeGfyCatVideoUploader);
         }
 
         [Theory]
         [MemberData(nameof(MessagesUpdateEventArgsWithNoValidUsernameMentions))]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithNoValidUsernameMentions_ThenNoUsernameMentionsWereHandled(MessagesUpdateEventArgs messagesUpdateEventArgs)
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithNoValidUsernameMentions_ThenNoUsernameMentionsWereHandled(MessagesUpdateEventArgs messagesUpdateEventArgs)
         {
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(A<string>._)).MustNotHaveHappened();
@@ -64,26 +68,26 @@ namespace RedditVideoRotationBotTests
             };
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOnePrivateMessage_ThenMessageWasHandled()
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOnePrivateMessage_ThenMessageWasHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneNonUsernameMentionMessage();
 
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMention_ThenUsernameMentionWasHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
 
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             AssertNumberOfReadMessages(1);
@@ -93,13 +97,13 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenTwoUsernameMentionsWereHandled()
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithTwoUsernameMentions_ThenTwoUsernameMentionsWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages();
 
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             AssertNumberOfReadMessages(2);
@@ -109,13 +113,13 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOnePrivateMessage_ThenOneUsernameMentionAndOnePrivateMessageWereHandled()
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithOneUsernameMentionAndOnePrivateMessage_ThenOneUsernameMentionAndOnePrivateMessageWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageAndOnePrivateMessage();
 
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             AssertNumberOfReadMessages(2);
@@ -126,13 +130,13 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public void GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithAMixOfMessages_ThenMessagesWereHandled()
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithAMixOfMessages_ThenMessagesWereHandled()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithAMixOfMessages();
 
             // Act
-            _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
             // Assert
             AssertNumberOfReadMessages(3);
