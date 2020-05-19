@@ -21,13 +21,16 @@ namespace RedditVideoRotationBotTests
 
         private readonly IGfyCatFileDropApi _fakeGfyCatFileDropApi;
 
+        private readonly IGfyCatApiConfiguration _fakeGfyCatApiConfiguration;
+
         private readonly IVideoUploader _gfyCatVideoUploader;
 
         public GfyCatVideoUploaderTests()
         {
             _fakeGfyCatApi = A.Fake<IGfyCatApi>();
             _fakeGfyCatFileDropApi = A.Fake<IGfyCatFileDropApi>();
-            _gfyCatVideoUploader = new GfyCatVideoUploader(_fakeGfyCatApi, _fakeGfyCatFileDropApi);
+            _fakeGfyCatApiConfiguration = A.Fake<IGfyCatApiConfiguration>();
+            _gfyCatVideoUploader = new GfyCatVideoUploader(_fakeGfyCatApi, _fakeGfyCatFileDropApi, _fakeGfyCatApiConfiguration);
         }
 
         public void Dispose()
