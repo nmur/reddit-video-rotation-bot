@@ -52,8 +52,12 @@ namespace RedditVideoRotationBot
 
             await _gfyCatFileDropApi.UploadVideoFromFile(gfyName, new StreamPart(stream, gfyName));
             Thread.Sleep(10000);
-            var response = await _gfyCatApi.GetGfyStatus(gfyName);
-            Console.WriteLine($"Reuploaded video URL: {response.Mp4Url}");
+            var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
+            if (gfyStatusResponse.Task == "complete")
+            {
+                var gfyResponse = await _gfyCatApi.GetGfy(gfyName);
+                Console.WriteLine($"Reuploaded video URL: {gfyResponse.GfyItem.Mp4Url}");
+            }
         }
     }
 }
