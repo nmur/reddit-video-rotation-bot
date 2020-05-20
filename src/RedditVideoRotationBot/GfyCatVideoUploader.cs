@@ -51,13 +51,41 @@ namespace RedditVideoRotationBot
             using var stream = File.OpenRead(gfyName);
 
             await _gfyCatFileDropApi.UploadVideoFromFile(gfyName, new StreamPart(stream, gfyName));
-            Thread.Sleep(10000);
-            var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
-            if (gfyStatusResponse.Task == "complete")
+
+            var task = WaitForVideoUploadToComplete(gfyName);
+            if (await Task.WhenAny(task, Task.Delay(60000)) == task)
             {
-                var gfyResponse = await _gfyCatApi.GetGfy(gfyName);
-                Console.WriteLine($"Reuploaded video URL: {gfyResponse.GfyItem.Mp4Url}");
+                string mp4Url;
+
+                var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
+                if (gfyStatusResponse.Md5Found == 1)
+                {
+                    mp4Url = gfyStatusResponse.Mp4Url;
+                }
+                else
+                {
+                    var gfyResponse = await _gfyCatApi.GetGfy(gfyName);
+                    mp4Url = gfyResponse.GfyItem.Mp4Url;
+                }
+
+                Console.WriteLine($"Reuploaded video URL: {mp4Url}");
             }
+            else
+            {
+                Console.WriteLine($"Timed-out while waiting for video upload and encode to complete");
+            }
+        }
+
+        private async Task WaitForVideoUploadToComplete(string gfyName)
+        {
+            var status = "";
+            while (status != "complete")
+            {
+                Thread.Sleep(5000);
+                var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
+                status = gfyStatusResponse.Task;
+            }
+            return;
         }
     }
 }

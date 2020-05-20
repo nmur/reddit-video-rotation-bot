@@ -57,6 +57,12 @@ namespace RedditVideoRotationBot.Interfaces
     {
         [JsonProperty("task")]
         public string Task { get; set; }
+
+        [JsonProperty("md5Found")]
+        public int? Md5Found { get; set; }
+
+        [JsonProperty("mp4Url")]
+        public string Mp4Url { get; set; }
     }
 
     public class GfyResponse
