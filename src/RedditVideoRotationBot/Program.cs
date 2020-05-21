@@ -78,7 +78,8 @@ namespace RedditVideoRotationBot
         {
             return new GfyCatApiConfiguration(
                 config["GfyCatApi:ClientId"],
-                config["GfyCatApi:ClientSecret"]);
+                config["GfyCatApi:ClientSecret"],
+                int.Parse(config["GfyCatApi:UploadTimeoutInMs"]));
         }
     }
 }

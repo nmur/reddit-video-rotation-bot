@@ -30,6 +30,7 @@ namespace RedditVideoRotationBotTests
             _fakeGfyCatApi = A.Fake<IGfyCatApi>();
             _fakeGfyCatFileDropApi = A.Fake<IGfyCatFileDropApi>();
             _fakeGfyCatApiConfiguration = A.Fake<IGfyCatApiConfiguration>();
+            A.CallTo(() => _fakeGfyCatApiConfiguration.GetUploadTimeoutInMs()).Returns(10000);
             _gfyCatVideoUploader = new GfyCatVideoUploader(_fakeGfyCatApi, _fakeGfyCatFileDropApi, _fakeGfyCatApiConfiguration);
         }
 

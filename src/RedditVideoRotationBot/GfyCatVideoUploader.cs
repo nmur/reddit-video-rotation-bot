@@ -53,7 +53,7 @@ namespace RedditVideoRotationBot
             await _gfyCatFileDropApi.UploadVideoFromFile(gfyName, new StreamPart(stream, gfyName));
 
             var task = WaitForVideoUploadToComplete(gfyName);
-            if (await Task.WhenAny(task, Task.Delay(60000)) == task)
+            if (await Task.WhenAny(task, Task.Delay(_gfyCatApiConfiguration.GetUploadTimeoutInMs())) == task)
             {
                 string mp4Url;
 
@@ -84,6 +84,7 @@ namespace RedditVideoRotationBot
                 Thread.Sleep(5000);
                 var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
                 status = gfyStatusResponse.Task;
+                Console.WriteLine($"Current status of video: {status}");
             }
             return;
         }

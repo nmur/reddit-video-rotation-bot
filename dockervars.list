@@ -3,3 +3,4 @@ RedditClient__AppSecret=
 RedditClient__RefreshToken=
 GfyCatApi__ClientId=
 GfyCatApi__ClientSecret=
+GfyCatApi__UploadTimeoutInMs=120000
