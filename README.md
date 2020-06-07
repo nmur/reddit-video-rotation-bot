@@ -44,5 +44,7 @@ Currently, the Docker image is not publicly available, however building the imag
     docker run --env-file ./dockervars.list reddit-video-rotation-bot
     ```
 
+## Unit tests
+Unit tests are run during the Docker build process. You can alternatively run and debug the entire suite using a test runner such as the one provided by Visual Studio 2019.
 
 
