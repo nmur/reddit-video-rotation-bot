@@ -18,6 +18,8 @@ namespace RedditVideoRotationBotTests
 
         private const string FakeGfyName = "fake_gfyName";
 
+        private const string FakeGfyNameDuplicate = "fake_gfyNameDuplicate";
+
         private readonly IGfyCatApi _fakeGfyCatApi;
 
         private readonly IGfyCatFileDropApi _fakeGfyCatFileDropApi;
@@ -42,7 +44,7 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalled_ThenVideoFileIsUploaded()
+        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalled_ThenVideoFileIsUploadedAndUrlIsReturned()
         {
             // Arrange
             CreateRotatedVideoFile();
@@ -54,6 +56,21 @@ namespace RedditVideoRotationBotTests
             // Assert
             A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();
             Assert.Equal($"https://giant.gfycat.com/{FakeGfyName}.mp4", gfyCatName);
+        }
+
+        [Fact]
+        public async Task GivenRotatedVideoExistsAndVideoHasBeenPreviouslyUploaded_WhenVideoUploadIsCalled_ThenVideoFileIsUploadedAndPreviouslyUploadedVideoUrlIsReturned()
+        {
+            // Arrange
+            CreateRotatedVideoFile(); 
+            SetupSuccessfulDuplicateApiCallStubs();
+
+             // Act
+             var gfyCatName = await _gfyCatVideoUploader.UploadAsync();
+
+            // Assert
+            A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();
+            Assert.Equal($"https://giant.gfycat.com/{FakeGfyNameDuplicate}.mp4", gfyCatName);
         }
 
         [Fact]
@@ -92,6 +109,13 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulCompleteGetGfy();
         }
 
+        private void SetupSuccessfulDuplicateApiCallStubs()
+        {
+            SetupSuccessfulTokenRequestStub();
+            SetupSuccessfulGfyCreation();
+            SetupSuccessfulDuplicateGfyStatus();
+        }
+
         private void SetupSuccessfulTokenRequestStub()
         {
             A.CallTo(() => _fakeGfyCatApi.GetAuthToken(A<GfyCatCredentials>._))
@@ -119,6 +143,18 @@ namespace RedditVideoRotationBotTests
                     Task = "complete"
                 });
         }
+
+        private void SetupSuccessfulDuplicateGfyStatus()
+        {
+            A.CallTo(() => _fakeGfyCatApi.GetGfyStatus(FakeGfyName))
+                .Returns(new GfyStatusResponse
+                {
+                    Task = "complete",
+                    Md5Found = 1,
+                    Mp4Url = $"https://giant.gfycat.com/{FakeGfyNameDuplicate}.mp4"
+                });
+        }
+
         private void SetupSuccessfulCompleteGetGfy()
         {
             A.CallTo(() => _fakeGfyCatApi.GetGfy(FakeGfyName))
