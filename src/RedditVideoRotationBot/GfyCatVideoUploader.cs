@@ -86,7 +86,7 @@ namespace RedditVideoRotationBot
             var status = "";
             while (status != "complete")
             {
-                Thread.Sleep(5000); //TODO: this period should be configurable, at least for testing
+                Thread.Sleep(_gfyCatApiConfiguration.GetUploadStatusPollingPeriodInMs());
                 var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
                 status = gfyStatusResponse.Task;
                 Console.WriteLine($"Current status of video: {status}");

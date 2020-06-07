@@ -7,5 +7,7 @@
         string GetClientSecret();
 
         int GetUploadTimeoutInMs();
+
+        int GetUploadStatusPollingPeriodInMs();
     }
 }

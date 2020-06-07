@@ -27,6 +27,11 @@ namespace RedditVideoRotationBot.Configurations
             return ClientSecret;
         }
 
+        public int GetUploadStatusPollingPeriodInMs()
+        {
+            return 5000;
+        }
+
         public int GetUploadTimeoutInMs()
         {
             return UploadTimeoutInMs;
