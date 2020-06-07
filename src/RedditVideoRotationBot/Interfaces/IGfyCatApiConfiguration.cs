@@ -5,5 +5,7 @@
         string GetClientId();
 
         string GetClientSecret();
+
+        int GetUploadTimeoutInMs();
     }
 }

@@ -14,6 +14,9 @@ namespace RedditVideoRotationBot.Interfaces
 
         [Get("/gfycats/fetch/status/{gfyName}")]
         Task<GfyStatusResponse> GetGfyStatus(string gfyName);
+
+        [Get("/gfycats/{gfyName}")]
+        Task<GfyResponse> GetGfy(string gfyName);
     }
 
     public class GfyCatCredentials
@@ -52,10 +55,25 @@ namespace RedditVideoRotationBot.Interfaces
 
     public class GfyStatusResponse
     {
-        [JsonProperty("mp4Url")]
-        public string Mp4Url { get; set; }
-
         [JsonProperty("task")]
         public string Task { get; set; }
+
+        [JsonProperty("md5Found")]
+        public int? Md5Found { get; set; }
+
+        [JsonProperty("mp4Url")]
+        public string Mp4Url { get; set; }
+    }
+
+    public class GfyResponse
+    {
+        [JsonProperty("gfyItem")]
+        public GfyItem GfyItem { get; set; }
+    }
+
+    public class GfyItem
+    {
+        [JsonProperty("mp4Url")]
+        public string Mp4Url { get; set; }
     }
 }

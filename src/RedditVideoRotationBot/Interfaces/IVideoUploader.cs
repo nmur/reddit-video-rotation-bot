@@ -4,6 +4,6 @@ namespace RedditVideoRotationBot.Interfaces
 {
     public interface IVideoUploader
     {
-        Task UploadAsync();
+        Task<string> UploadAsync();
     }
 }

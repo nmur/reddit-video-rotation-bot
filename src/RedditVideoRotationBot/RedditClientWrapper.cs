@@ -35,11 +35,11 @@ namespace RedditVideoRotationBot
             _redditClient.Account.Messages.ReadMessage(id);
         }
 
-        public void ReplyToComment(string id)
+        public void ReplyToComment(string id, string text)
         {
             try
             {
-                _redditClient.Comment(id).Reply("pong");
+                _redditClient.Comment(id).Reply(text);
             }
             catch (RedditRateLimitException)
             {

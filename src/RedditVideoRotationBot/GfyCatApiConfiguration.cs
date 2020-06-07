@@ -8,10 +8,13 @@ namespace RedditVideoRotationBot
 
         private readonly string ClientSecret;
 
-        public GfyCatApiConfiguration(string clientId, string clientSecret)
+        private readonly int UploadTimeoutInMs;
+
+        public GfyCatApiConfiguration(string clientId, string clientSecret, int uploadTimeoutInMs)
         {
             ClientId = clientId;
             ClientSecret = clientSecret;
+            UploadTimeoutInMs = uploadTimeoutInMs;
         }
 
         public string GetClientId()
@@ -22,6 +25,11 @@ namespace RedditVideoRotationBot
         public string GetClientSecret()
         {
             return ClientSecret;
+        }
+
+        public int GetUploadTimeoutInMs()
+        {
+            return UploadTimeoutInMs;
         }
     }
 }

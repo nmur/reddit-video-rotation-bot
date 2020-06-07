@@ -46,9 +46,9 @@ namespace RedditVideoRotationBot
 
                     _videoDownloader.DownloadFromUrl(videoUrl);
                     _videoRotator.Rotate();
-                    await _videoUploader.UploadAsync();
+                    var uploadedVideoUrl = await _videoUploader.UploadAsync();
 
-                    ReplyToComment(message);
+                    ReplyToComment(message, uploadedVideoUrl);
                 }
 
                 MarkMessageAsRead(message);
@@ -83,9 +83,9 @@ namespace RedditVideoRotationBot
             }
         }
 
-        private void ReplyToComment(Message message)
+        private void ReplyToComment(Message message, string url)
         {
-            _redditClientWrapper.ReplyToComment(GetMessageFullname(message));
+            _redditClientWrapper.ReplyToComment(GetMessageFullname(message), url);
             Console.WriteLine($"Comment was replied to");
         }
 
