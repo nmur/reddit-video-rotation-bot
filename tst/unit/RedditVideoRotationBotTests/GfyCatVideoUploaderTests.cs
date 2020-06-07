@@ -1,6 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using RedditVideoRotationBot;
+using RedditVideoRotationBot.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 using Refit;
 using System;
@@ -86,7 +87,7 @@ namespace RedditVideoRotationBotTests
             Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            await uploadAction.Should().ThrowAsync<Exception>();
+            await uploadAction.Should().ThrowAsync<VideoUploadException>();
         }
 
         [Fact]
@@ -99,7 +100,7 @@ namespace RedditVideoRotationBotTests
             Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            await uploadAction.Should().ThrowAsync<Exception>();
+            await uploadAction.Should().ThrowAsync<VideoUploadException>();
         }
 
         private void SetupSuccessfulApiCallStubs()
