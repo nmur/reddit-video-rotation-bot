@@ -28,7 +28,7 @@ namespace RedditVideoRotationBot
             string token = await GetAuthToken();
             var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}");
 
-            if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4")) //TODO: move the file check from here, should be performed earlier
+            if (gfyCreationResponse.IsOk)
             {
                 return await UploadVideoAndReturnMp4Url(gfyCreationResponse.GfyName);
             }

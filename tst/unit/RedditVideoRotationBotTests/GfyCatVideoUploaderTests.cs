@@ -90,19 +90,6 @@ namespace RedditVideoRotationBotTests
             await uploadAction.Should().ThrowAsync<VideoUploadException>();
         }
 
-        [Fact]
-        public async Task GivenRotatedVideoDoesNotExist_WhenVideoUploadIsCalled_ThenVideoFileIsNotUploaded()
-        {
-            // Arrange
-            SetupSuccessfulApiCallStubs();
-
-            // Act
-            Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
-
-            // Assert
-            await uploadAction.Should().ThrowAsync<VideoUploadException>();
-        }
-
         private void SetupSuccessfulApiCallStubs()
         {
             SetupSuccessfulTokenRequestStub();
