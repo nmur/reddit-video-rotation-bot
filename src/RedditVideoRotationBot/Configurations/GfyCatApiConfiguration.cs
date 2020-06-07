@@ -1,6 +1,6 @@
 ﻿using RedditVideoRotationBot.Interfaces;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Configurations
 {
     public class GfyCatApiConfiguration : IGfyCatApiConfiguration
     {
