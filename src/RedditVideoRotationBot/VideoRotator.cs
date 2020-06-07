@@ -1,4 +1,5 @@
-﻿using RedditVideoRotationBot.Interfaces;
+﻿using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +14,6 @@ namespace RedditVideoRotationBot
         {
             if (File.Exists("video.mp4"))
             {
-                Console.WriteLine($"video.mp4 found");
                 var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -26,11 +26,8 @@ namespace RedditVideoRotationBot
                     }
                 };
 
-                Console.WriteLine($"Starting video rotation...");
                 proc.Start();
-                Console.WriteLine($"Started video rotation, waiting for process to complete...");
                 proc.WaitForExit();
-                Console.WriteLine($"Process complete with exit code: {proc.ExitCode}");
             }
 
             if (File.Exists("video_rotated.mp4"))
@@ -39,7 +36,7 @@ namespace RedditVideoRotationBot
             }
             else
             {
-                Console.WriteLine($"ERROR: video rotated unsuccessfully!");
+                throw new VideoRotateException("Video rotation failed.");
             }
         }
     }
