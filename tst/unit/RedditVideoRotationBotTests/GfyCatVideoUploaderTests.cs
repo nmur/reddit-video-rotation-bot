@@ -1,6 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
 using RedditVideoRotationBot;
+using RedditVideoRotationBot.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 using Refit;
 using System;
@@ -34,7 +35,8 @@ namespace RedditVideoRotationBotTests
             _fakeGfyCatApi = A.Fake<IGfyCatApi>();
             _fakeGfyCatFileDropApi = A.Fake<IGfyCatFileDropApi>();
             _fakeGfyCatApiConfiguration = A.Fake<IGfyCatApiConfiguration>();
-            A.CallTo(() => _fakeGfyCatApiConfiguration.GetUploadTimeoutInMs()).Returns(10000);
+            A.CallTo(() => _fakeGfyCatApiConfiguration.GetUploadTimeoutInMs()).Returns(500);
+            A.CallTo(() => _fakeGfyCatApiConfiguration.GetUploadStatusPollingPeriodInMs()).Returns(10);
             _gfyCatVideoUploader = new GfyCatVideoUploader(_fakeGfyCatApi, _fakeGfyCatFileDropApi, _fakeGfyCatApiConfiguration);
         }
 
@@ -74,7 +76,7 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalledButGfyCreationFails_ThenVideoFileIsNotUploaded()
+        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalledButGfyCreationFails_ThenVideoUploadExceptionIsThrown()
         {
             // Arrange
             CreateRotatedVideoFile();
@@ -85,20 +87,23 @@ namespace RedditVideoRotationBotTests
             Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            await uploadAction.Should().ThrowAsync<Exception>();
+            await uploadAction.Should().ThrowAsync<VideoUploadException>();
         }
 
         [Fact]
-        public async Task GivenRotatedVideoDoesNotExist_WhenVideoUploadIsCalled_ThenVideoFileIsNotUploaded()
+        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalledButGfyUploadTimesOut_ThenVideoUploadTimedOutExceptionIsThrown()
         {
             // Arrange
-            SetupSuccessfulApiCallStubs();
+            CreateRotatedVideoFile();
+            SetupSuccessfulTokenRequestStub();
+            SetupSuccessfulGfyCreation();
+            SetupSuccessfulEncodingGfyStatus();
 
             // Act
             Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            await uploadAction.Should().ThrowAsync<Exception>();
+            await uploadAction.Should().ThrowAsync<VideoUploadTimeOutException>();
         }
 
         private void SetupSuccessfulApiCallStubs()
@@ -141,6 +146,15 @@ namespace RedditVideoRotationBotTests
                 .Returns(new GfyStatusResponse
                 {
                     Task = "complete"
+                });
+        }
+
+        private void SetupSuccessfulEncodingGfyStatus()
+        {
+            A.CallTo(() => _fakeGfyCatApi.GetGfyStatus(FakeGfyName))
+                .Returns(new GfyStatusResponse
+                {
+                    Task = "encoding"
                 });
         }
 

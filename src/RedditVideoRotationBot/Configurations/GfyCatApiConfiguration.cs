@@ -1,6 +1,6 @@
 ﻿using RedditVideoRotationBot.Interfaces;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Configurations
 {
     public class GfyCatApiConfiguration : IGfyCatApiConfiguration
     {
@@ -25,6 +25,11 @@ namespace RedditVideoRotationBot
         public string GetClientSecret()
         {
             return ClientSecret;
+        }
+
+        public int GetUploadStatusPollingPeriodInMs()
+        {
+            return 5000;
         }
 
         public int GetUploadTimeoutInMs()

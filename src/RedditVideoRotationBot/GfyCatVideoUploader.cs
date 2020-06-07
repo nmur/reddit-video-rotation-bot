@@ -1,4 +1,5 @@
-﻿using RedditVideoRotationBot.Interfaces;
+﻿using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
 using Refit;
 using System;
 using System.IO;
@@ -27,13 +28,13 @@ namespace RedditVideoRotationBot
             string token = await GetAuthToken();
             var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}");
 
-            if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4")) //TODO: move the file check from here, should be performed earlier
+            if (gfyCreationResponse.IsOk)
             {
-                return await UploadVideo(gfyCreationResponse.GfyName);
+                return await UploadVideoAndReturnMp4Url(gfyCreationResponse.GfyName);
             }
             else
             {
-                throw new Exception("Gfy creation was not successful"); //TODO: create more specific exception
+                throw new VideoUploadException("Gfy creation was not successful");
             }
         }
 
@@ -48,50 +49,87 @@ namespace RedditVideoRotationBot
             return gfyCatTokenResponse.AccessToken;
         }
 
-        private async Task<string> UploadVideo(string gfyName)
+        private async Task<string> UploadVideoAndReturnMp4Url(string gfyName)
         {
             Console.WriteLine($"Gfyname: {gfyName}");
-            File.Move("video_rotated.mp4", gfyName);
-            using var stream = File.OpenRead(gfyName);
+            RenameRotatedVideoFileToGfyName(gfyName);
+            await UploadVideoToFileDrop(gfyName);
 
-            await _gfyCatFileDropApi.UploadVideoFromFile(gfyName, new StreamPart(stream, gfyName));
-
-            var task = WaitForVideoUploadToComplete(gfyName);
-            if (await Task.WhenAny(task, Task.Delay(_gfyCatApiConfiguration.GetUploadTimeoutInMs())) == task)
+            var task = GetWaitForVideoUploadToCompleteTask(gfyName);
+            if (task.Wait(_gfyCatApiConfiguration.GetUploadTimeoutInMs()))
             {
-                string mp4Url;
-
-                var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
-                if (gfyStatusResponse.Md5Found == 1) //video file was already uploaded
-                {
-                    mp4Url = gfyStatusResponse.Mp4Url;
-                }
-                else
-                {
-                    var gfyResponse = await _gfyCatApi.GetGfy(gfyName);
-                    mp4Url = gfyResponse.GfyItem.Mp4Url;
-                }
-
-                Console.WriteLine($"Reuploaded video URL: {mp4Url}");
-                return mp4Url;
+                return await GetMp4UrlForGfyName(gfyName);
             }
             else
             {
-                throw new Exception("Timed-out while waiting for video upload and encode to complete"); //TODO: create more specific exception
+                throw new VideoUploadTimeOutException("Timed-out while waiting for video upload and encode to complete");
             }
         }
 
-        private async Task WaitForVideoUploadToComplete(string gfyName)
+        private async Task UploadVideoToFileDrop(string gfyName)
         {
-            var status = "";
-            while (status != "complete")
+            using var stream = File.OpenRead(gfyName);
+            await _gfyCatFileDropApi.UploadVideoFromFile(gfyName, new StreamPart(stream, gfyName));
+        }
+
+        private static void RenameRotatedVideoFileToGfyName(string gfyName)
+        {
+            File.Move("video_rotated.mp4", gfyName);
+        }
+
+        private async Task<string> GetMp4UrlForGfyName(string gfyName)
+        {
+            var gfyStatusResponse = await GetGfyStatus(gfyName);
+
+            if (WasVideoUploadedPreviously(gfyStatusResponse))
             {
-                Thread.Sleep(5000); //TODO: this period should be configurable, at least for testing
-                var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
-                status = gfyStatusResponse.Task;
-                Console.WriteLine($"Current status of video: {status}");
+                return GetMp4UrlForPreviouslyUploadedVideo(gfyStatusResponse);
             }
-            return;
+            else
+            {
+                return await GetMp4UrlForUploadedVideo(gfyName);
+            }
+        }
+
+        private async Task<GfyStatusResponse> GetGfyStatus(string gfyName)
+        {
+            return await _gfyCatApi.GetGfyStatus(gfyName);
+        }
+
+        private static bool WasVideoUploadedPreviously(GfyStatusResponse gfyStatusResponse)
+        {
+            return gfyStatusResponse.Md5Found == 1;
+        }
+
+        private static string GetMp4UrlForPreviouslyUploadedVideo(GfyStatusResponse gfyStatusResponse)
+        {
+            return gfyStatusResponse.Mp4Url;
+        }
+
+        private async Task<string> GetMp4UrlForUploadedVideo(string gfyName)
+        {
+            var gfyResponse = await GetGfy(gfyName);
+            return gfyResponse.GfyItem.Mp4Url;
+        }
+
+        private async Task<GfyResponse> GetGfy(string gfyName)
+        {
+            return await _gfyCatApi.GetGfy(gfyName);
+        }
+
+        private async Task GetWaitForVideoUploadToCompleteTask(string gfyName)
+        {
+            await Task.Run(async () =>
+             {
+                 var status = "";
+                 while (status != "complete")
+                 {
+                     Thread.Sleep(_gfyCatApiConfiguration.GetUploadStatusPollingPeriodInMs());
+                     status = (await GetGfyStatus(gfyName)).Task;
+                     Console.WriteLine($"Current status of video: {status}");
+                 }
+                 return;
+             });
         }
     }
 }

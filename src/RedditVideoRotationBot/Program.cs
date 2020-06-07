@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RedditVideoRotationBot.Configurations;
 using RedditVideoRotationBot.Interfaces;
 using Refit;
 using System;
