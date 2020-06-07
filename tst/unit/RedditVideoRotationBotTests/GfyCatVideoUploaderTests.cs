@@ -1,4 +1,5 @@
 ﻿using FakeItEasy;
+using FluentAssertions;
 using RedditVideoRotationBot;
 using RedditVideoRotationBot.Interfaces;
 using Refit;
@@ -48,10 +49,11 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulApiCallStubs();
 
             // Act
-            await _gfyCatVideoUploader.UploadAsync();
+            var gfyCatName = await _gfyCatVideoUploader.UploadAsync();
 
             // Assert
             A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();
+            Assert.Equal($"https://giant.gfycat.com/{FakeGfyName}.mp4", gfyCatName);
         }
 
         [Fact]
@@ -63,10 +65,10 @@ namespace RedditVideoRotationBotTests
             SetupUnsuccessfulGfyCreation();
 
             // Act
-            await _gfyCatVideoUploader.UploadAsync();
+            Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustNotHaveHappened();
+            await uploadAction.Should().ThrowAsync<Exception>();
         }
 
         [Fact]
@@ -76,10 +78,10 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulApiCallStubs();
 
             // Act
-            await _gfyCatVideoUploader.UploadAsync();
+            Func<Task> uploadAction = async () => { await _gfyCatVideoUploader.UploadAsync(); };
 
             // Assert
-            A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustNotHaveHappened();
+            await uploadAction.Should().ThrowAsync<Exception>();
         }
 
         private void SetupSuccessfulApiCallStubs()

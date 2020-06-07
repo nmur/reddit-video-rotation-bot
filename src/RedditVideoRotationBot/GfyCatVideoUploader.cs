@@ -22,14 +22,18 @@ namespace RedditVideoRotationBot
             _gfyCatApiConfiguration = gfyCatApiConfiguration;
         }
 
-        public async Task UploadAsync()
+        public async Task<string> UploadAsync()
         {
             string token = await GetAuthToken();
             var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}");
 
-            if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4"))
+            if (gfyCreationResponse.IsOk && File.Exists("video_rotated.mp4")) //TODO: move the file check from here, should be performed earlier
             {
-                await UploadVideo(gfyCreationResponse.GfyName);
+                return await UploadVideo(gfyCreationResponse.GfyName);
+            }
+            else
+            {
+                throw new Exception("Gfy creation was not successful");
             }
         }
 
@@ -44,7 +48,7 @@ namespace RedditVideoRotationBot
             return gfyCatTokenResponse.AccessToken;
         }
 
-        private async Task UploadVideo(string gfyName)
+        private async Task<string> UploadVideo(string gfyName)
         {
             Console.WriteLine($"Gfyname: {gfyName}");
             File.Move("video_rotated.mp4", gfyName);
@@ -69,10 +73,11 @@ namespace RedditVideoRotationBot
                 }
 
                 Console.WriteLine($"Reuploaded video URL: {mp4Url}");
+                return mp4Url;
             }
             else
             {
-                Console.WriteLine($"Timed-out while waiting for video upload and encode to complete");
+                throw new Exception("Timed-out while waiting for video upload and encode to complete");
             }
         }
 
