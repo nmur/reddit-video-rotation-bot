@@ -87,6 +87,7 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulTokenRequestStub();
             SetupSuccessfulGfyCreation();
             SetupSuccessfulCompleteGfyStatus();
+            SetupSuccessfulCompleteGetGfy();
         }
 
         private void SetupSuccessfulTokenRequestStub()
@@ -114,6 +115,17 @@ namespace RedditVideoRotationBotTests
                 .Returns(new GfyStatusResponse
                 {
                     Task = "complete"
+                });
+        }
+        private void SetupSuccessfulCompleteGetGfy()
+        {
+            A.CallTo(() => _fakeGfyCatApi.GetGfy(FakeGfyName))
+                .Returns(new GfyResponse
+                {
+                    GfyItem = new GfyItem
+                    {
+                        Mp4Url = $"https://giant.gfycat.com/{FakeGfyName}.mp4"
+                    }
                 });
         }
 
