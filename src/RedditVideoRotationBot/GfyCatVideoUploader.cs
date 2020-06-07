@@ -33,7 +33,7 @@ namespace RedditVideoRotationBot
             }
             else
             {
-                throw new Exception("Gfy creation was not successful");
+                throw new Exception("Gfy creation was not successful"); //TODO: create more specific exception
             }
         }
 
@@ -77,7 +77,7 @@ namespace RedditVideoRotationBot
             }
             else
             {
-                throw new Exception("Timed-out while waiting for video upload and encode to complete");
+                throw new Exception("Timed-out while waiting for video upload and encode to complete"); //TODO: create more specific exception
             }
         }
 
@@ -86,7 +86,7 @@ namespace RedditVideoRotationBot
             var status = "";
             while (status != "complete")
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(5000); //TODO: this period should be configurable, at least for testing
                 var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
                 status = gfyStatusResponse.Task;
                 Console.WriteLine($"Current status of video: {status}");

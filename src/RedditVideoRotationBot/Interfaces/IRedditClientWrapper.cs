@@ -12,7 +12,7 @@ namespace RedditVideoRotationBot.Interfaces
 
         void ReadMessage(string id);
 
-        void ReplyToComment(string id);
+        void ReplyToComment(string id, string text);
 
         Post GetCommentRootPost(string id);
     }
