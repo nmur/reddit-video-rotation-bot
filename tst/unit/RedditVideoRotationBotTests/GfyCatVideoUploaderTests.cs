@@ -27,6 +27,7 @@ namespace RedditVideoRotationBotTests
 
         public GfyCatVideoUploaderTests()
         {
+            DeleteTestFiles();
             _fakeGfyCatApi = A.Fake<IGfyCatApi>();
             _fakeGfyCatFileDropApi = A.Fake<IGfyCatFileDropApi>();
             _fakeGfyCatApiConfiguration = A.Fake<IGfyCatApiConfiguration>();
@@ -36,8 +37,7 @@ namespace RedditVideoRotationBotTests
 
         public void Dispose()
         {
-            if (File.Exists("video_rotated.mp4")) File.Delete("video_rotated.mp4");
-            if (File.Exists(FakeGfyName)) File.Delete(FakeGfyName);
+            DeleteTestFiles();
         }
 
         [Fact]
@@ -86,6 +86,7 @@ namespace RedditVideoRotationBotTests
         {
             SetupSuccessfulTokenRequestStub();
             SetupSuccessfulGfyCreation();
+            SetupSuccessfulCompleteGfyStatus();
         }
 
         private void SetupSuccessfulTokenRequestStub()
@@ -107,6 +108,15 @@ namespace RedditVideoRotationBotTests
                 });
         }
 
+        private void SetupSuccessfulCompleteGfyStatus()
+        {
+            A.CallTo(() => _fakeGfyCatApi.GetGfyStatus(FakeGfyName))
+                .Returns(new GfyStatusResponse
+                {
+                    Task = "complete"
+                });
+        }
+
         private void SetupUnsuccessfulGfyCreation()
         {
             A.CallTo(() => _fakeGfyCatApi.CreateGfy($"Bearer {FakeToken}"))
@@ -124,6 +134,12 @@ namespace RedditVideoRotationBotTests
                 var info = new UTF8Encoding(true).GetBytes("Adding some text into the file.");
                 fs.Write(info, 0, info.Length);
             }
+        }
+
+        private static void DeleteTestFiles()
+        {
+            if (File.Exists("video_rotated.mp4")) File.Delete("video_rotated.mp4");
+            if (File.Exists(FakeGfyName)) File.Delete(FakeGfyName);
         }
     }
 }

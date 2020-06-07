@@ -58,7 +58,7 @@ namespace RedditVideoRotationBot
                 string mp4Url;
 
                 var gfyStatusResponse = await _gfyCatApi.GetGfyStatus(gfyName);
-                if (gfyStatusResponse.Md5Found == 1)
+                if (gfyStatusResponse.Md5Found == 1) //video file was already uploaded
                 {
                     mp4Url = gfyStatusResponse.Mp4Url;
                 }
