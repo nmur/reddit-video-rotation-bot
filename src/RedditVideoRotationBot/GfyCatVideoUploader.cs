@@ -56,7 +56,7 @@ namespace RedditVideoRotationBot
             await UploadVideoToFileDrop(gfyName);
 
             var task = GetWaitForVideoUploadToCompleteTask(gfyName);
-            if (await WaitForTaskToCompleteAndReturnSuccessfulness(task))
+            if (task.Wait(_gfyCatApiConfiguration.GetUploadTimeoutInMs()))
             {
                 return await GetMp4UrlForGfyName(gfyName);
             }
@@ -75,11 +75,6 @@ namespace RedditVideoRotationBot
         private static void RenameRotatedVideoFileToGfyName(string gfyName)
         {
             File.Move("video_rotated.mp4", gfyName);
-        }
-
-        private async Task<bool> WaitForTaskToCompleteAndReturnSuccessfulness(Task task)
-        {
-            return await Task.WhenAny(task, Task.Delay(_gfyCatApiConfiguration.GetUploadTimeoutInMs())) == task;
         }
 
         private async Task<string> GetMp4UrlForGfyName(string gfyName)
@@ -124,14 +119,17 @@ namespace RedditVideoRotationBot
 
         private async Task GetWaitForVideoUploadToCompleteTask(string gfyName)
         {
-            var status = "";
-            while (status != "complete")
-            {
-                Thread.Sleep(_gfyCatApiConfiguration.GetUploadStatusPollingPeriodInMs());
-                status = (await GetGfyStatus(gfyName)).Task;
-                Console.WriteLine($"Current status of video: {status}");
-            }
-            return;
+            await Task.Run(async () =>
+             {
+                 var status = "";
+                 while (status != "complete")
+                 {
+                     Thread.Sleep(_gfyCatApiConfiguration.GetUploadStatusPollingPeriodInMs());
+                     status = (await GetGfyStatus(gfyName)).Task;
+                     Console.WriteLine($"Current status of video: {status}");
+                 }
+                 return;
+             });
         }
     }
 }
