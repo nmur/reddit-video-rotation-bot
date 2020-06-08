@@ -1,3 +1,5 @@
+[![CircleCI](https://img.shields.io/circleci/build/github/nmur/reddit-video-rotation-bot)](https://circleci.com/gh/nmur/reddit-video-rotation-bot) [![Docker Pulls](https://img.shields.io/docker/pulls/nmur/reddit-video-rotation-bot)](https://hub.docker.com/r/nmur/reddit-video-rotation-bot) 
+
 # reddit-video-rotation-bot
 A summonable Reddit bot that rotates videos.
 
