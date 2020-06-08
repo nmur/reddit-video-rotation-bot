@@ -8,6 +8,7 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System;
+using RedditVideoRotationBot.Exceptions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -174,7 +175,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<Exception>();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<VideoDownloadException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
@@ -191,7 +192,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeVideoRotator.Rotate()).Throws<Exception>();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).Throws<VideoRotateException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
@@ -207,7 +208,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<Exception>();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<VideoUploadException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
