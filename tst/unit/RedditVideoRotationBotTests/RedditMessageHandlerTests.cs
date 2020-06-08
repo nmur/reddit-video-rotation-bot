@@ -7,6 +7,7 @@ using FakeItEasy;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System;
 
 namespace RedditVideoRotationBotTests
 {
@@ -164,6 +165,25 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<Exception>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
         private void SetupCommentRootPostStubs()

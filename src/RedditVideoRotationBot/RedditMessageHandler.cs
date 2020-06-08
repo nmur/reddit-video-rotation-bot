@@ -46,7 +46,6 @@ namespace RedditVideoRotationBot
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Failed to process video rotation sequence: {ex}");
-                        continue;
                     }
                 }
 
