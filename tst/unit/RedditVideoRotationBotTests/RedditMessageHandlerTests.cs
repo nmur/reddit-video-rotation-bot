@@ -16,6 +16,10 @@ namespace RedditVideoRotationBotTests
 
         private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
 
+        private const string UsernameMentionWithNoMediaId = "xyzxyz";
+
+        private const string UsernameMentionWithNoMediaFullname = "t1_" + UsernameMentionWithNoMediaId;
+
         private const string PrivateMessageId = "abcabc";
 
         private const string PrivateMessageFullname = "t4_" + PrivateMessageId;
@@ -147,11 +151,27 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
         }
 
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenNoVideoUrlWasFoundInPost_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostWithNoMedia();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
+        }
+
         private void SetupCommentRootPostStubs()
         {
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithVideoMedia());
         }
 
         private static Reddit.Controllers.Post GetPostWithVideoMedia()
@@ -214,6 +234,14 @@ namespace RedditVideoRotationBotTests
             };
         }
 
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostWithNoMedia()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetUsernameMentionWithNoMediaMessage() }
+            };
+        }
+
         private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages()
         {
             return new MessagesUpdateEventArgs
@@ -264,6 +292,17 @@ namespace RedditVideoRotationBotTests
                 Subject = "username mention",
                 WasComment = true,
                 Id = UsernameMentionId
+            };
+        }
+
+        private static Message GetUsernameMentionWithNoMediaMessage()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "username mention with no media",
+                WasComment = true,
+                Id = UsernameMentionWithNoMediaId
             };
         }
 
