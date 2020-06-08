@@ -170,7 +170,7 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
@@ -184,6 +184,37 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoRotateFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).Throws<Exception>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoUploadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<Exception>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
         }
 
         private void SetupCommentRootPostStubs()
