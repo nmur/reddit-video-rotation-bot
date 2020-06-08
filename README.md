@@ -22,7 +22,7 @@ Currently the username of the bot is [/u/video-rotator](https://www.reddit.com/u
     
 More detailed instructions are available [here](https://github.com/nmur/reddit-video-rotation-bot/wiki/Detailed-steps-for-running-your-own-instance-of-the-bot).
 
-### Building
+## Building
 1. Download, install, and run [Docker](https://docs.docker.com/get-docker/).
 2. Clone the repo:  
     ```   
