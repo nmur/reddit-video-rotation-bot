@@ -19,6 +19,10 @@ namespace RedditVideoRotationBot
 
         private const string UsernameMentionSubjectString = "username mention";
 
+        private const string VideoFileNameString = "video.mp4";
+
+        private const string RotatedVideoFileNameString = "video_rotated.mp4";
+
         public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
@@ -33,22 +37,16 @@ namespace RedditVideoRotationBot
 
             foreach (var message in e.NewMessages)
             {
-                Console.WriteLine($"Message received from {message.Author}");
-
-                if (MessageIsUsernameMention(message)) //TODO: refactor this body when scope and form becomes more apparent
+                if (MessageIsUsernameMention(message))
                 {
-                    Console.WriteLine($"Message was a user mention");
-                    string videoUrl = RedditPostParser.TryGetVideoUrlFromPost(GetCommentRootPost(message));
-                    Console.WriteLine($"videoUrl: {videoUrl}");
-
-                    //delete video file if there's one already. only process one file at a time for now
-                    DeleteVideoFilesIfPresent();
-
-                    _videoDownloader.DownloadFromUrl(videoUrl);
-                    _videoRotator.Rotate();
-                    var uploadedVideoUrl = await _videoUploader.UploadAsync();
-
-                    ReplyToComment(message, uploadedVideoUrl);
+                    try
+                    {
+                        await RotateAndUploadVideo(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Failed to process video rotation sequence: {ex}");
+                    }
                 }
 
                 MarkMessageAsRead(message);
@@ -58,6 +56,25 @@ namespace RedditVideoRotationBot
         private static bool MessageIsUsernameMention(Message message)
         {
             return message.Subject == UsernameMentionSubjectString && message.WasComment;
+        }
+
+        private async Task RotateAndUploadVideo(Message message)
+        {
+            string videoUrl = GetVideoUrlFromPost(message);
+
+            //delete video file if there's one already. only process one file at a time for now
+            DeleteVideoFilesIfPresent();
+
+            _videoDownloader.DownloadFromUrl(videoUrl);
+            _videoRotator.Rotate();
+            var uploadedVideoUrl = await _videoUploader.UploadAsync();
+
+            ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
+        }
+
+        private string GetVideoUrlFromPost(Message message)
+        {
+            return RedditPostParser.TryGetVideoUrlFromPost(GetCommentRootPost(message));
         }
 
         private Post GetCommentRootPost(Message message)
@@ -73,17 +90,11 @@ namespace RedditVideoRotationBot
 
         private static void DeleteVideoFilesIfPresent()
         {
-            if (File.Exists("video.mp4"))
-            {
-                File.Delete("video.mp4");
-            }
-            if (File.Exists("video_rotated.mp4"))
-            {
-                File.Delete("video_rotated.mp4");
-            }
+            if (File.Exists(VideoFileNameString)) File.Delete(VideoFileNameString);
+            if (File.Exists(RotatedVideoFileNameString)) File.Delete(RotatedVideoFileNameString);
         }
 
-        private void ReplyToComment(Message message, string url)
+        private void ReplyToCommentWithUploadedVideoUrl(Message message, string url)
         {
             _redditClientWrapper.ReplyToComment(GetMessageFullname(message), url);
             Console.WriteLine($"Comment was replied to");

@@ -7,6 +7,8 @@ using FakeItEasy;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using System;
+using RedditVideoRotationBot.Exceptions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -15,6 +17,10 @@ namespace RedditVideoRotationBotTests
         private const string UsernameMentionId = "xyzxyz";
 
         private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
+
+        private const string UsernameMentionWithNoMediaId = "xyzxyz";
+
+        private const string UsernameMentionWithNoMediaFullname = "t1_" + UsernameMentionWithNoMediaId;
 
         private const string PrivateMessageId = "abcabc";
 
@@ -147,11 +153,77 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
         }
 
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenNoVideoUrlWasFoundInPost_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostWithNoMedia();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<VideoDownloadException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoRotateFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).Throws<VideoRotateException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenVideoUploadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<VideoUploadException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+        }
+
         private void SetupCommentRootPostStubs()
         {
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithVideoMedia());
         }
 
         private static Reddit.Controllers.Post GetPostWithVideoMedia()
@@ -214,6 +286,14 @@ namespace RedditVideoRotationBotTests
             };
         }
 
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostWithNoMedia()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetUsernameMentionWithNoMediaMessage() }
+            };
+        }
+
         private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages()
         {
             return new MessagesUpdateEventArgs
@@ -264,6 +344,17 @@ namespace RedditVideoRotationBotTests
                 Subject = "username mention",
                 WasComment = true,
                 Id = UsernameMentionId
+            };
+        }
+
+        private static Message GetUsernameMentionWithNoMediaMessage()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "username mention with no media",
+                WasComment = true,
+                Id = UsernameMentionWithNoMediaId
             };
         }
 

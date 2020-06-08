@@ -1,4 +1,6 @@
-﻿using RedditVideoRotationBot.Interfaces;
+﻿using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
@@ -9,8 +11,15 @@ namespace RedditVideoRotationBot
     {
         public void DownloadFromUrl(string url)
         {
-            using var client = new WebClient();
-            client.DownloadFile(url, "video.mp4");
+            try
+            {
+                using var client = new WebClient();
+                client.DownloadFile(url, "video.mp4");
+            }
+            catch (Exception ex)
+            {
+                throw new VideoDownloadException(ex.Message);
+            }
         }
     }
 }
