@@ -2,6 +2,10 @@
 using Reddit.Things;
 using Newtonsoft.Json.Linq;
 using RedditVideoRotationBot;
+using RedditVideoRotationBot.Exceptions;
+using System;
+using static FluentAssertions.FluentActions;
+using FluentAssertions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -28,20 +32,18 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
-        public void GivenRedditPostWithNoVideo_WhenVideoUrlIsParsedFromPost_ThenEmptyStringIsReturned()
+        public void GivenRedditPostWithNoVideo_WhenVideoUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
         {
             // Arrange
             var post = new Post();
 
-            // Act
-            var url = RedditPostParser.TryGetVideoUrlFromPost(post);
-
-            // Assert
-            Assert.Equal("", url);
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetVideoUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
         }
 
         [Fact]
-        public void GivenRedditPostWithNonVideoMedia_WhenVideoUrlIsParsedFromPost_ThenEmptyStringIsReturned()
+        public void GivenRedditPostWithNonVideoMedia_WhenVideoUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
         {
             // Arrange
             var post = new Post
@@ -49,11 +51,9 @@ namespace RedditVideoRotationBotTests
                 Media = JObject.Parse("{\"some_other_media\":{\"data\":\"value\"}}")
             };
 
-            // Act
-            var url = RedditPostParser.TryGetVideoUrlFromPost(post);
-
-            // Assert
-            Assert.Equal("", url);
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetVideoUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace RedditVideoRotationBotTests
 
         private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
 
-        private const string UsernameMentionWithNoMediaId = "xyzxyz";
+        private const string UsernameMentionWithNoMediaId = "defdef";
 
         private const string UsernameMentionWithNoMediaFullname = "t1_" + UsernameMentionWithNoMediaId;
 
@@ -243,7 +243,7 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
-            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithVideoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionOnNsfwPostFullname)).Returns(GetNsfwPostWithVideoMedia());
         }
 
