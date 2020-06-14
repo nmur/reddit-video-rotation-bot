@@ -7,7 +7,6 @@ using FakeItEasy;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
-using System;
 using RedditVideoRotationBot.Exceptions;
 
 namespace RedditVideoRotationBotTests
@@ -18,7 +17,7 @@ namespace RedditVideoRotationBotTests
 
         private const string UsernameMentionFullname = "t1_" + UsernameMentionId;
 
-        private const string UsernameMentionWithNoMediaId = "xyzxyz";
+        private const string UsernameMentionWithNoMediaId = "defdef";
 
         private const string UsernameMentionWithNoMediaFullname = "t1_" + UsernameMentionWithNoMediaId;
 
@@ -29,6 +28,10 @@ namespace RedditVideoRotationBotTests
         private const string CommentReplyId = "abcabc";
 
         private const string CommentReplyFullname = "t1_" + CommentReplyId;
+
+        private const string UsernameMentionOnNsfwPostId = "qwerty";
+
+        private const string UsernameMentionOnNsfwPostFullname = "t1_" + UsernameMentionOnNsfwPostId;
 
         private const string VideoUrlString = "https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback";
 
@@ -218,12 +221,30 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(0);
         }
 
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionOnNsfwMediaPost_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostMarkedAsNsfw();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
         private void SetupCommentRootPostStubs()
         {
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(PrivateMessageFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
-            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithVideoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithNoMedia());
+            A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionOnNsfwPostFullname)).Returns(GetNsfwPostWithVideoMedia());
         }
 
         private static Reddit.Controllers.Post GetPostWithVideoMedia()
@@ -234,6 +255,11 @@ namespace RedditVideoRotationBotTests
         private static Reddit.Controllers.Post GetPostWithNoMedia()
         {
             return new Reddit.Controllers.Post(null, new Post());
+        }
+
+        private static Reddit.Controllers.Post GetNsfwPostWithVideoMedia()
+        {
+            return new Reddit.Controllers.Post(null, new Post { Media = JObject.Parse(MediaString), Over18 = true });
         }
 
         private void AssertOneUsernameMentionWasMarkedReadAndRepliedTo()
@@ -291,6 +317,14 @@ namespace RedditVideoRotationBotTests
             return new MessagesUpdateEventArgs
             {
                 NewMessages = new List<Message> { GetUsernameMentionWithNoMediaMessage() }
+            };
+        }
+
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostMarkedAsNsfw()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetUsernameMentionWithNsfwMessage() }
             };
         }
 
@@ -352,9 +386,20 @@ namespace RedditVideoRotationBotTests
             return new Message
             {
                 Author = "test-user",
-                Subject = "username mention with no media",
+                Subject = "username mention",
                 WasComment = true,
                 Id = UsernameMentionWithNoMediaId
+            };
+        }
+
+        private static Message GetUsernameMentionWithNsfwMessage()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "username mention",
+                WasComment = true,
+                Id = UsernameMentionOnNsfwPostId
             };
         }
 

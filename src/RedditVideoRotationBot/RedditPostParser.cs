@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Reddit.Things;
+using RedditVideoRotationBot.Exceptions;
 using System;
 
 namespace RedditVideoRotationBot
@@ -17,8 +18,7 @@ namespace RedditVideoRotationBot
             }
             catch (Exception)
             {
-                Console.WriteLine("No video found in post");
-                return "";
+                throw new RedditPostParserException("Failed to find media url in post");
             }
         }
     }

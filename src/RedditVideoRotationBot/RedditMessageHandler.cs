@@ -60,7 +60,9 @@ namespace RedditVideoRotationBot
 
         private async Task RotateAndUploadVideo(Message message)
         {
-            string videoUrl = GetVideoUrlFromPost(message);
+            var post = GetCommentRootPost(message);
+            ThrowExceptionIfPostIsNsfw(post);
+            string videoUrl = GetVideoUrlFromPost(post);
 
             //delete video file if there's one already. only process one file at a time for now
             DeleteVideoFilesIfPresent();
@@ -72,9 +74,15 @@ namespace RedditVideoRotationBot
             ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
         }
 
-        private string GetVideoUrlFromPost(Message message)
+        private static void ThrowExceptionIfPostIsNsfw(Post post)
         {
-            return RedditPostParser.TryGetVideoUrlFromPost(GetCommentRootPost(message));
+            if (post.Over18) 
+                throw new NotImplementedException("NSFW posts will not be handled until NSFW media upload resource is implemented");
+        }
+
+        private string GetVideoUrlFromPost(Post post)
+        {
+            return RedditPostParser.TryGetVideoUrlFromPost(post);
         }
 
         private Post GetCommentRootPost(Message message)
