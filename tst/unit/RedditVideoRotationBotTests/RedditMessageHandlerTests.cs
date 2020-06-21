@@ -249,6 +249,23 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionWithNoRotationArgument_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
         private void SetupCommentRootPostStubs()
         {
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionFullname)).Returns(GetPostWithVideoMedia());
@@ -339,6 +356,14 @@ namespace RedditVideoRotationBotTests
             };
         }
 
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetUsernameMentionWithNoRotationArgument() }
+            };
+        }
+
         private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages()
         {
             return new MessagesUpdateEventArgs
@@ -414,6 +439,18 @@ namespace RedditVideoRotationBotTests
                 WasComment = true,
                 Id = UsernameMentionOnNsfwPostId,
                 Body = "/u/bot cw"
+            };
+        }
+
+        private static Message GetUsernameMentionWithNoRotationArgument()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "username mention",
+                WasComment = true,
+                Id = UsernameMentionOnNsfwPostId,
+                Body = "/u/bot"
             };
         }
 
