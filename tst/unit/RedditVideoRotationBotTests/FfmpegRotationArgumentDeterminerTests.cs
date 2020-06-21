@@ -9,11 +9,24 @@ namespace RedditVideoRotationBotTests
     public class FfmpegRotationArgumentDeterminerTests
     {
         [Fact]
-        public void GivenNoMessageArgument_WhenFfmpegRotationArgumentIsDetermined_ThenArgumentNullExceptionIsThrown()
+        public void GivenNoMessageArgument_WhenFfmpegRotationArgumentIsDetermined_ThenArgumentExceptionIsThrown()
         {
-            // Act + Assert
+            // Arrange + Act + Assert
             Invoking(() => FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg(""))
-                .Should().Throw<ArgumentNullException>();
+                .Should().Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void GivenMessageArgumentOf90_WhenFfmpegRotationArgumentIsDetermined_ThenFfmpegArgumentOf90IsReturned()
+        {
+            // Arrange 
+            var expectedRotationArg = "90";
+
+            // Act
+            var rotationArg = FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg("90");
+
+            // Assert
+            Assert.Equal(expectedRotationArg, rotationArg);
         }
     }
 }

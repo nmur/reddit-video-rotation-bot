@@ -8,7 +8,10 @@ namespace RedditVideoRotationBot
         {
             switch (messageArg)
             {
-                default: throw new ArgumentNullException("Invalid or empty rotation argument from message.");
+                case "90":
+                    return "90";
+                default: 
+                    throw new ArgumentException("Invalid or empty rotation argument from message.");
             }
         }
     }
