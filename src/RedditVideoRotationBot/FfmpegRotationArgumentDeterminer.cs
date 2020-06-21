@@ -6,9 +6,12 @@ namespace RedditVideoRotationBot
     {
         public static string GetRotationArgFromMessageArg(string messageArg)
         {
-            switch (messageArg)
+            switch (messageArg.ToLower())
             {
                 case "90":
+                case "ccw":
+                case "counterclockwise":
+                case "left":
                     return "90";
                 default: 
                     throw new ArgumentException("Invalid or empty rotation argument from message.");

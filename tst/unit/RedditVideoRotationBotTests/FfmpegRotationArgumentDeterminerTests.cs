@@ -16,14 +16,18 @@ namespace RedditVideoRotationBotTests
                 .Should().Throw<ArgumentException>();
         }
 
-        [Fact]
-        public void GivenMessageArgumentOf90_WhenFfmpegRotationArgumentIsDetermined_ThenFfmpegArgumentOf90IsReturned()
+        [Theory]
+        [InlineData("90")]
+        [InlineData("ccw")]
+        [InlineData("counterclockwise")]
+        [InlineData("left")]
+        public void GivenMessageArgumentEquivalentTo90_WhenFfmpegRotationArgumentIsDetermined_ThenFfmpegArgumentOf90IsReturned(string messageArg)
         {
             // Arrange 
             var expectedRotationArg = "90";
 
             // Act
-            var rotationArg = FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg("90");
+            var rotationArg = FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg(messageArg);
 
             // Assert
             Assert.Equal(expectedRotationArg, rotationArg);
