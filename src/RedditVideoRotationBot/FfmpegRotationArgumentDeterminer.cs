@@ -13,6 +13,11 @@ namespace RedditVideoRotationBot
                 case "counterclockwise":
                 case "left":
                     return "90";
+                case "270":
+                case "cw":
+                case "clockwise":
+                case "right":
+                    return "270";
                 default: 
                     throw new ArgumentException("Invalid or empty rotation argument from message.");
             }

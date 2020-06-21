@@ -32,5 +32,22 @@ namespace RedditVideoRotationBotTests
             // Assert
             Assert.Equal(expectedRotationArg, rotationArg);
         }
+
+        [Theory]
+        [InlineData("270")]
+        [InlineData("cw")]
+        [InlineData("clockwise")]
+        [InlineData("right")]
+        public void GivenMessageArgumentEquivalentTo270_WhenFfmpegRotationArgumentIsDetermined_ThenFfmpegArgumentOf270IsReturned(string messageArg)
+        {
+            // Arrange 
+            var expectedRotationArg = "270";
+
+            // Act
+            var rotationArg = FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg(messageArg);
+
+            // Assert
+            Assert.Equal(expectedRotationArg, rotationArg);
+        }
     }
 }
