@@ -1,10 +1,15 @@
-﻿namespace RedditVideoRotationBot
+﻿using System;
+
+namespace RedditVideoRotationBot
 {
     public static class FfmpegRotationArgumentDeterminer
     {
         public static string GetRotationArgFromMessageArg(string messageArg)
         {
-            return "90";
+            switch (messageArg)
+            {
+                default: throw new ArgumentNullException("Invalid or empty rotation argument from message.");
+            }
         }
     }
 }

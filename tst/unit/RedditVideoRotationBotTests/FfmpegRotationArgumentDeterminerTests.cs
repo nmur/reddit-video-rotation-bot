@@ -1,17 +1,19 @@
 ﻿using Xunit;
+using static FluentAssertions.FluentActions;
+using FluentAssertions;
+using System;
+using RedditVideoRotationBot;
 
 namespace RedditVideoRotationBotTests
 {
     public class FfmpegRotationArgumentDeterminerTests
     {
         [Fact]
-        public void Given_When_Then()
+        public void GivenNoMessageArgument_WhenFfmpegRotationArgumentIsDetermined_ThenArgumentNullExceptionIsThrown()
         {
-            // Arrange
-
-            // Act
-
-            // Assert
+            // Act + Assert
+            Invoking(() => FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg(""))
+                .Should().Throw<ArgumentNullException>();
         }
     }
 }
