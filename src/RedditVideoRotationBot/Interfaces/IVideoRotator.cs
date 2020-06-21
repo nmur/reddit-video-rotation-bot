@@ -2,6 +2,6 @@
 {
     public interface IVideoRotator
     {
-        void Rotate();
+        void Rotate(string rotationArgument);
     }
 }
