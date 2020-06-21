@@ -87,6 +87,9 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
         [Fact]
@@ -103,6 +106,8 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -119,6 +124,8 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(2);
             AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -136,6 +143,8 @@ namespace RedditVideoRotationBotTests
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -154,6 +163,8 @@ namespace RedditVideoRotationBotTests
             AssertOnePrivateMessageWasMarkedRead();
             AssertOneCommentReplyWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -377,7 +388,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionId
+                Id = UsernameMentionId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -388,7 +400,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionWithNoMediaId
+                Id = UsernameMentionWithNoMediaId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -399,7 +412,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionOnNsfwPostId
+                Id = UsernameMentionOnNsfwPostId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -410,7 +424,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "hey!",
                 WasComment = false,
-                Id = PrivateMessageId
+                Id = PrivateMessageId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -421,7 +436,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "comment reply",
                 WasComment = true,
-                Id = CommentReplyId
+                Id = CommentReplyId,
+                Body = "/u/bot cw"
             };
         }
     }
