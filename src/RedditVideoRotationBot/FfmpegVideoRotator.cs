@@ -10,18 +10,18 @@ namespace RedditVideoRotationBot
     [ExcludeFromCodeCoverage] //TODO: should be integration tested though
     public class FfmpegVideoRotator : IVideoRotator
     {
-        public void Rotate(string rotationArgument)
+        public void Rotate(string messageArg)
         {
             if (File.Exists("video.mp4"))
             {
-                var rotationValue = GetRotationValue();
+                var rotationArg = FfmpegRotationArgumentDeterminer.GetRotationArgFromMessageArg(messageArg);
 
                 var proc = new Process
                 {
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "ffmpeg",
-                        Arguments = $"-i video.mp4 -c copy -metadata:s:v:0 rotate={rotationValue} video_rotated.mp4",
+                        Arguments = $"-i video.mp4 -c copy -metadata:s:v:0 rotate={rotationArg} video_rotated.mp4",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         RedirectStandardError = true
@@ -40,11 +40,6 @@ namespace RedditVideoRotationBot
             {
                 throw new VideoRotateException("Video rotation failed.");
             }
-        }
-
-        private static string GetRotationValue()
-        {
-            return "90";
         }
     }
 }
