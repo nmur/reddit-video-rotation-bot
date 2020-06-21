@@ -87,6 +87,9 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
         [Fact]
@@ -103,6 +106,8 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -119,6 +124,8 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(2);
             AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -136,6 +143,8 @@ namespace RedditVideoRotationBotTests
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -154,6 +163,8 @@ namespace RedditVideoRotationBotTests
             AssertOnePrivateMessageWasMarkedRead();
             AssertOneCommentReplyWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -169,7 +180,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
@@ -186,7 +197,7 @@ namespace RedditVideoRotationBotTests
             // Assert
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
@@ -195,7 +206,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeVideoRotator.Rotate()).Throws<VideoRotateException>();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).Throws<VideoRotateException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
@@ -234,8 +245,38 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate()).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionWithNoRotationArgument_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionNoRotationArgument_ThenVideoRotatorIsGivenRotationArgument()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappened();
         }
 
         private void SetupCommentRootPostStubs()
@@ -328,6 +369,14 @@ namespace RedditVideoRotationBotTests
             };
         }
 
+        private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument()
+        {
+            return new MessagesUpdateEventArgs
+            {
+                NewMessages = new List<Message> { GetUsernameMentionWithNoRotationArgument() }
+            };
+        }
+
         private static MessagesUpdateEventArgs GetMessagesUpdateEventArgsWithTwoUsernameMentionMessages()
         {
             return new MessagesUpdateEventArgs
@@ -377,7 +426,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionId
+                Id = UsernameMentionId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -388,7 +438,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionWithNoMediaId
+                Id = UsernameMentionWithNoMediaId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -399,7 +450,20 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "username mention",
                 WasComment = true,
-                Id = UsernameMentionOnNsfwPostId
+                Id = UsernameMentionOnNsfwPostId,
+                Body = "/u/bot cw"
+            };
+        }
+
+        private static Message GetUsernameMentionWithNoRotationArgument()
+        {
+            return new Message
+            {
+                Author = "test-user",
+                Subject = "username mention",
+                WasComment = true,
+                Id = UsernameMentionOnNsfwPostId,
+                Body = "/u/bot"
             };
         }
 
@@ -410,7 +474,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "hey!",
                 WasComment = false,
-                Id = PrivateMessageId
+                Id = PrivateMessageId,
+                Body = "/u/bot cw"
             };
         }
 
@@ -421,7 +486,8 @@ namespace RedditVideoRotationBotTests
                 Author = "test-user",
                 Subject = "comment reply",
                 WasComment = true,
-                Id = CommentReplyId
+                Id = CommentReplyId,
+                Body = "/u/bot cw"
             };
         }
     }

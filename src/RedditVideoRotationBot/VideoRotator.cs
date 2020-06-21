@@ -10,7 +10,7 @@ namespace RedditVideoRotationBot
     [ExcludeFromCodeCoverage] //TODO: should be integration tested though
     public class VideoRotator : IVideoRotator
     {
-        public void Rotate()
+        public void Rotate(string rotationArgument)
         {
             if (File.Exists("video.mp4"))
             {

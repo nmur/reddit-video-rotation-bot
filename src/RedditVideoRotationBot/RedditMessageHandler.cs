@@ -60,6 +60,12 @@ namespace RedditVideoRotationBot
 
         private async Task RotateAndUploadVideo(Message message)
         {
+            var messageBodySplitIntoWords = message.Body.Split(' ');
+            if (messageBodySplitIntoWords.Length < 2)
+                throw new ArgumentNullException("Rotation argument missing from user mention.");
+
+            var rotationArgument = messageBodySplitIntoWords[1];
+
             var post = GetCommentRootPost(message);
             ThrowExceptionIfPostIsNsfw(post);
             string videoUrl = GetVideoUrlFromPost(post);
@@ -68,7 +74,7 @@ namespace RedditVideoRotationBot
             DeleteVideoFilesIfPresent();
 
             _videoDownloader.DownloadFromUrl(videoUrl);
-            _videoRotator.Rotate();
+            _videoRotator.Rotate(rotationArgument);
             var uploadedVideoUrl = await _videoUploader.UploadAsync();
 
             ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
