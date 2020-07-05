@@ -5,6 +5,8 @@ using RedditVideoRotationBot.Interfaces;
 using System.IO;
 using System;
 using System.Text;
+using static FluentAssertions.FluentActions;
+using FluentAssertions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -64,6 +66,18 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public void GivenVideoAndAudioFilesAreFound_WhenVideoAndAudioFilesCominationIsRequestedAndFfmpegCommandThrowException_ThenNoExceptionIsPropagated()
+        {
+            // Arrange
+            CreateVideoFile();
+            CreateAudioFile();
+            A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).Throws<Exception>();
+
+            // Act + Assert
+            Invoking(() => _mediaProcessor.CombineVideoAndAudio()).Should().NotThrow();
         }
 
         private static void CreateVideoFile()
