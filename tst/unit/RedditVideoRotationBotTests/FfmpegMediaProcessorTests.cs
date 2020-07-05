@@ -10,17 +10,21 @@ using FluentAssertions;
 
 namespace RedditVideoRotationBotTests
 {
-    public class MediaProcessorTests : IDisposable
+    public class FfmpegMediaProcessorTests : IDisposable
     {
+        private const string VideoFileName = "video.mp4";
+
+        private const string AudioFileName = "audio.mp4";
+
         private readonly IFfmpegExecutor _fakeFfmpegExecutor;
 
-        private readonly IMediaProcessor _mediaProcessor;
+        private readonly IMediaProcessor _FfmpegMediaProcessor;
 
-        public MediaProcessorTests()
+        public FfmpegMediaProcessorTests()
         {
             DeleteTestFiles();
             _fakeFfmpegExecutor = A.Fake<IFfmpegExecutor>();
-            _mediaProcessor = new MediaProcessor(_fakeFfmpegExecutor);
+            _FfmpegMediaProcessor = new FfmpegMediaProcessor(_fakeFfmpegExecutor);
         }
 
         public void Dispose()
@@ -36,7 +40,7 @@ namespace RedditVideoRotationBotTests
             CreateAudioFile();
 
             // Act
-            _mediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaProcessor.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustHaveHappenedOnceExactly();
@@ -49,7 +53,7 @@ namespace RedditVideoRotationBotTests
             CreateVideoFile();
 
             // Act
-            _mediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaProcessor.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustNotHaveHappened();
@@ -62,14 +66,14 @@ namespace RedditVideoRotationBotTests
             CreateAudioFile();
 
             // Act
-            _mediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaProcessor.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustNotHaveHappened();
         }
 
         [Fact]
-        public void GivenVideoAndAudioFilesAreFound_WhenVideoAndAudioFilesCominationIsRequestedAndFfmpegCommandThrowException_ThenNoExceptionIsPropagated()
+        public void GivenVideoAndAudioFilesAreFound_WhenVideoAndAudioFilesCominationIsRequestedAndFfmpegCommandThrowsException_ThenNoExceptionIsPropagated()
         {
             // Arrange
             CreateVideoFile();
@@ -77,14 +81,14 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).Throws<Exception>();
 
             // Act + Assert
-            Invoking(() => _mediaProcessor.CombineVideoAndAudio()).Should().NotThrow();
+            Invoking(() => _FfmpegMediaProcessor.CombineVideoAndAudio()).Should().NotThrow();
         }
 
         private static void CreateVideoFile()
         {
-            if (!File.Exists("video.mp4"))
+            if (!File.Exists(VideoFileName))
             {
-                using var fs = File.Create("video.mp4");
+                using var fs = File.Create(VideoFileName);
                 var info = new UTF8Encoding(true).GetBytes("Adding some text into the file.");
                 fs.Write(info, 0, info.Length);
             }
@@ -92,9 +96,9 @@ namespace RedditVideoRotationBotTests
 
         private static void CreateAudioFile()
         {
-            if (!File.Exists("audio.mp4"))
+            if (!File.Exists(AudioFileName))
             {
-                using var fs = File.Create("audio.mp4");
+                using var fs = File.Create(AudioFileName);
                 var info = new UTF8Encoding(true).GetBytes("Adding some text into the file.");
                 fs.Write(info, 0, info.Length);
             }
@@ -102,8 +106,8 @@ namespace RedditVideoRotationBotTests
 
         private static void DeleteTestFiles()
         {
-            if (File.Exists("video.mp4")) File.Delete("video.mp4");
-            if (File.Exists("audio.mp4")) File.Delete("audio.mp4");
+            if (File.Exists(VideoFileName)) File.Delete(VideoFileName);
+            if (File.Exists(AudioFileName)) File.Delete(AudioFileName);
         }
     }
 }

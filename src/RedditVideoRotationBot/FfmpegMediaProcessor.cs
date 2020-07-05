@@ -4,11 +4,11 @@ using System.IO;
 
 namespace RedditVideoRotationBot
 {
-    public class MediaProcessor : IMediaProcessor
+    public class FfmpegMediaProcessor : IMediaProcessor
     {
         private readonly IFfmpegExecutor _ffmpegExecutor;
 
-        public MediaProcessor(IFfmpegExecutor ffmpegExecutor)
+        public FfmpegMediaProcessor(IFfmpegExecutor ffmpegExecutor)
         {
             _ffmpegExecutor = ffmpegExecutor;
         }
