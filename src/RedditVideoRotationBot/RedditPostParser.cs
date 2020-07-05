@@ -8,6 +8,10 @@ namespace RedditVideoRotationBot
 {
     public static class RedditPostParser
     {
+        private const string VideoResourcePrefix = "DASH_";
+
+        private const string AudioResourceString = "audio";
+
         public static string TryGetVideoUrlFromPost(Post post)
         {
             try
@@ -20,6 +24,10 @@ namespace RedditVideoRotationBot
             {
                 throw new RedditPostParserException("Failed to find media url in post");
             }
+        }
+        public static string TryGetAudioUrlFromPost(Post post)
+        {
+            return TryGetVideoUrlFromPost(post).Split(VideoResourcePrefix)[0] + AudioResourceString;
         }
     }
 
