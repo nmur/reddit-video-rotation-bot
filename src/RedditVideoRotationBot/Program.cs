@@ -50,6 +50,7 @@ namespace RedditVideoRotationBot
             services.AddSingleton<IGfyCatApiConfiguration>(gfyCatApiConfiguration);
             services.AddSingleton<IVideoUploader, GfyCatVideoUploader>();
             services.AddSingleton<IVideoDownloader, VideoDownloader>();
+            services.AddSingleton<IAudioDownloader, AudioDownloader>();
             services.AddSingleton<IVideoRotator, FfmpegVideoRotator>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();
