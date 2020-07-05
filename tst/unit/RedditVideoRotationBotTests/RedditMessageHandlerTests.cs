@@ -45,6 +45,8 @@ namespace RedditVideoRotationBotTests
 
         private readonly IAudioDownloader _fakeAudioDownloader;
 
+        private readonly IMediaProcessor _fakeMediaProcessor;
+
         private readonly IVideoRotator _fakeVideoRotator;
 
         private readonly IRedditMessageHandler _redditMessageHandler;
@@ -57,9 +59,10 @@ namespace RedditVideoRotationBotTests
             SetupCommentRootPostStubs();
             _fakeVideoDownloader = A.Fake<IVideoDownloader>();
             _fakeAudioDownloader = A.Fake<IAudioDownloader>();
+            _fakeMediaProcessor = A.Fake<IMediaProcessor>();
             _fakeVideoRotator = A.Fake<IVideoRotator>();
             _fakeGfyCatVideoUploader = A.Fake<IVideoUploader>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeAudioDownloader, _fakeVideoRotator, _fakeGfyCatVideoUploader);
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeAudioDownloader, _fakeMediaProcessor, _fakeVideoRotator, _fakeGfyCatVideoUploader);
         }
 
         [Theory]
@@ -94,6 +97,7 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
@@ -113,6 +117,7 @@ namespace RedditVideoRotationBotTests
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
@@ -132,6 +137,7 @@ namespace RedditVideoRotationBotTests
             AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedTwiceExactly();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedTwiceExactly();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedTwiceExactly();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedTwiceExactly();
         }
@@ -152,6 +158,7 @@ namespace RedditVideoRotationBotTests
             AssertOnePrivateMessageWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
@@ -173,6 +180,7 @@ namespace RedditVideoRotationBotTests
             AssertOneCommentReplyWasMarkedRead();
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
         }
@@ -191,6 +199,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
@@ -209,6 +218,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
@@ -258,6 +268,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
@@ -276,6 +287,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
             A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }

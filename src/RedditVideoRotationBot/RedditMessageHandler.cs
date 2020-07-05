@@ -15,6 +15,8 @@ namespace RedditVideoRotationBot
 
         private readonly IAudioDownloader _audioDownloader;
 
+        private readonly IMediaProcessor _mediaProcessor;
+
         private readonly IVideoRotator _videoRotator;
 
         private readonly IVideoUploader _videoUploader;
@@ -25,11 +27,13 @@ namespace RedditVideoRotationBot
 
         private const string RotatedVideoFileNameString = "video_rotated.mp4";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
+        //TODO: refactor: separate the reddit/video responsibilities
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IMediaProcessor mediaProcessor, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _audioDownloader = audioDownloader;
+            _mediaProcessor = mediaProcessor;
             _videoRotator = videoRotator;
             _videoUploader = videoUploader;
         }
@@ -79,6 +83,7 @@ namespace RedditVideoRotationBot
 
             _videoDownloader.DownloadFromUrl(videoUrl);
             _audioDownloader.DownloadFromUrl(audioUrl);
+            _mediaProcessor.CombineVideoAndAudio();
             _videoRotator.Rotate(rotationArgument);
             var uploadedVideoUrl = await _videoUploader.UploadAsync();
 
