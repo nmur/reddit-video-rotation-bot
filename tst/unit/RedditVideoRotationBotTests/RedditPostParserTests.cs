@@ -12,9 +12,15 @@ namespace RedditVideoRotationBotTests
     {
         private const string VideoUrlString = "https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback";
 
+        private const string VideoUrlVariationString = "https://v.redd.it/abcabcabcabc/DASH_1080.mp4?source=fallback";
+
         private const string AudioUrlString = "https://v.redd.it/abcabcabcabc/audio";
 
+        private const string AudioUrlVariationString = "https://v.redd.it/abcabcabcabc/DASH_audio.mp4?source=fallback";
+
         private const string MediaString = "{\"reddit_video\":{\"fallback_url\":\"https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback\",\"height\":1080,\"width\":608,\"scrubber_media_url\":\"https://v.redd.it/abcabcabcabc/DASH_96\",\"dash_url\":\"https://v.redd.it/abcabcabcabc/DASHPlaylist.mpd\",\"duration\":8,\"hls_url\":\"https://v.redd.it/abcabcabcabc/HLSPlaylist.m3u8\",\"is_gif\":false,\"transcoding_status\":\"completed\"}}";
+
+        private const string MediaVariationString = "{\"reddit_video\":{\"fallback_url\":\"https://v.redd.it/abcabcabcabc/DASH_1080.mp4?source=fallback\",\"height\":1080,\"width\":608,\"scrubber_media_url\":\"https://v.redd.it/abcabcabcabc/DASH_96.mp4\",\"dash_url\":\"https://v.redd.it/abcabcabcabc/DASHPlaylist.mpd\",\"duration\":8,\"hls_url\":\"https://v.redd.it/abcabcabcabc/HLSPlaylist.m3u8\",\"is_gif\":false,\"transcoding_status\":\"completed\"}}";
 
         [Fact]
         public void GivenRedditPostWithVideo_WhenVideoUrlIsParsedFromPost_ThenUrlIsReturnedSuccessfully()
@@ -30,6 +36,22 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             Assert.Equal(VideoUrlString, url);
+        }
+
+        [Fact]
+        public void GivenRedditPostWithVideoWithAlternativeVideoUrl_WhenVideoUrlIsParsedFromPost_ThenUrlIsReturnedSuccessfully()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse(MediaVariationString)
+            };
+
+            // Act
+            var url = RedditPostParser.TryGetVideoUrlFromPost(post);
+
+            // Assert
+            Assert.Equal(VideoUrlVariationString, url);
         }
 
         [Fact]
@@ -55,6 +77,22 @@ namespace RedditVideoRotationBotTests
             // Act + Assert
             Invoking(() => RedditPostParser.TryGetVideoUrlFromPost(post))
                 .Should().Throw<RedditPostParserException>();
+        }
+
+        [Fact]
+        public void GivenRedditPostWithAudioWithAlternativeAudioUrl_WhenAudioUrlIsParsedFromPost_ThenUrlIsReturnedSuccessfully()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse(MediaVariationString)
+            };
+
+            // Act
+            var url = RedditPostParser.TryGetAudioUrlFromPost(post);
+
+            // Assert
+            Assert.Equal(AudioUrlVariationString, url);
         }
 
         [Fact]
