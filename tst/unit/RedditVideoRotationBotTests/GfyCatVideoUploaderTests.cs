@@ -132,7 +132,7 @@ namespace RedditVideoRotationBotTests
 
         private void SetupSuccessfulGfyCreation()
         {
-            A.CallTo(() => _fakeGfyCatApi.CreateGfy($"Bearer {FakeToken}"))
+            A.CallTo(() => _fakeGfyCatApi.CreateGfy($"Bearer {FakeToken}", A<GfyCatCreationParameters>._))
                 .Returns(new GfyCreationResponse
                 {
                     IsOk = true,
@@ -183,7 +183,7 @@ namespace RedditVideoRotationBotTests
 
         private void SetupUnsuccessfulGfyCreation()
         {
-            A.CallTo(() => _fakeGfyCatApi.CreateGfy($"Bearer {FakeToken}"))
+            A.CallTo(() => _fakeGfyCatApi.CreateGfy($"Bearer {FakeToken}", A<GfyCatCreationParameters>._))
                 .Returns(new GfyCreationResponse
                 {
                     IsOk = false

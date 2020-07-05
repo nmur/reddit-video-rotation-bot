@@ -10,7 +10,7 @@ namespace RedditVideoRotationBot.Interfaces
         Task<GfyCatTokenResponse> GetAuthToken([Body] GfyCatCredentials gfyCatCredentials);
 
         [Post("/gfycats")]
-        Task<GfyCreationResponse> CreateGfy([Header("Authorization")] string authorization);
+        Task<GfyCreationResponse> CreateGfy([Header("Authorization")] string authorization, [Body] GfyCatCreationParameters gfyCatCreationParameters);
 
         [Get("/gfycats/fetch/status/{gfyName}")]
         Task<GfyStatusResponse> GetGfyStatus(string gfyName);
@@ -29,6 +29,11 @@ namespace RedditVideoRotationBot.Interfaces
 
         [JsonProperty("client_secret")]
         public string ClientSecret { get; set; }
+    }
+    public class GfyCatCreationParameters
+    {
+        [JsonProperty("keepAudio")]
+        public bool KeepAudio { get; set; }
     }
 
     public class GfyCatTokenResponse

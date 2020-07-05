@@ -25,6 +25,8 @@ namespace RedditVideoRotationBot
 
         private const string VideoFileNameString = "video.mp4";
 
+        private const string AudioFileNameString = "audio.mp4";
+
         private const string RotatedVideoFileNameString = "video_rotated.mp4";
 
         //TODO: refactor: separate the reddit/video responsibilities
@@ -79,7 +81,7 @@ namespace RedditVideoRotationBot
             string audioUrl = GetAudioUrlFromPost(post);
 
             //delete video file if there's one already. only process one file at a time for now
-            DeleteVideoFilesIfPresent();
+            DeleteMediaFilesIfPresent();
 
             _videoDownloader.DownloadFromUrl(videoUrl);
             _audioDownloader.DownloadFromUrl(audioUrl);
@@ -117,9 +119,10 @@ namespace RedditVideoRotationBot
             Console.WriteLine($"Message was marked as read");
         }
 
-        private static void DeleteVideoFilesIfPresent()
+        private static void DeleteMediaFilesIfPresent()
         {
             if (File.Exists(VideoFileNameString)) File.Delete(VideoFileNameString);
+            if (File.Exists(AudioFileNameString)) File.Delete(AudioFileNameString);
             if (File.Exists(RotatedVideoFileNameString)) File.Delete(RotatedVideoFileNameString);
         }
 

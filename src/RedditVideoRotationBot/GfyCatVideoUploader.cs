@@ -26,7 +26,7 @@ namespace RedditVideoRotationBot
         public async Task<string> UploadAsync()
         {
             string token = await GetAuthToken();
-            var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}");
+            var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}", new GfyCatCreationParameters{KeepAudio = true});
 
             if (gfyCreationResponse.IsOk)
             {

@@ -19,7 +19,9 @@ namespace RedditVideoRotationBot
             {
                 if (File.Exists("video.mp4") && File.Exists("audio.mp4"))
                 {
-                    _ffmpegExecutor.ExecuteFfmpegCommandWithArgString("-i video.mp4 -i audio.mp4 -c copy video.mp4");
+                    _ffmpegExecutor.ExecuteFfmpegCommandWithArgString("-y -i video.mp4 -i audio.mp4 -c copy combined_video.mp4");
+                    File.Delete("video.mp4");
+                    File.Move("combined_video.mp4", "video.mp4");
                 }
             }
             catch (Exception)
