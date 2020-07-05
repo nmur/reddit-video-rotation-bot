@@ -13,6 +13,8 @@ namespace RedditVideoRotationBot
 
         private readonly IVideoDownloader _videoDownloader;
 
+        private readonly IAudioDownloader _audioDownloader;
+
         private readonly IVideoRotator _videoRotator;
 
         private readonly IVideoUploader _videoUploader;
@@ -23,10 +25,11 @@ namespace RedditVideoRotationBot
 
         private const string RotatedVideoFileNameString = "video_rotated.mp4";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
+            _audioDownloader = audioDownloader;
             _videoRotator = videoRotator;
             _videoUploader = videoUploader;
         }
@@ -69,11 +72,13 @@ namespace RedditVideoRotationBot
             var post = GetCommentRootPost(message);
             ThrowExceptionIfPostIsNsfw(post);
             string videoUrl = GetVideoUrlFromPost(post);
+            string audioUrl = GetAudioUrlFromPost(post);
 
             //delete video file if there's one already. only process one file at a time for now
             DeleteVideoFilesIfPresent();
 
             _videoDownloader.DownloadFromUrl(videoUrl);
+            _audioDownloader.DownloadFromUrl(audioUrl);
             _videoRotator.Rotate(rotationArgument);
             var uploadedVideoUrl = await _videoUploader.UploadAsync();
 
@@ -89,6 +94,11 @@ namespace RedditVideoRotationBot
         private string GetVideoUrlFromPost(Post post)
         {
             return RedditPostParser.TryGetVideoUrlFromPost(post);
+        }
+
+        private string GetAudioUrlFromPost(Post post)
+        {
+            return RedditPostParser.TryGetAudioUrlFromPost(post);
         }
 
         private Post GetCommentRootPost(Message message)

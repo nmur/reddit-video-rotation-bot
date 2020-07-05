@@ -3,7 +3,6 @@ using Reddit.Things;
 using Newtonsoft.Json.Linq;
 using RedditVideoRotationBot;
 using RedditVideoRotationBot.Exceptions;
-using System;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
 
@@ -12,6 +11,8 @@ namespace RedditVideoRotationBotTests
     public class RedditPostParserTests
     {
         private const string VideoUrlString = "https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback";
+
+        private const string AudioUrlString = "https://v.redd.it/abcabcabcabc/audio";
 
         private const string MediaString = "{\"reddit_video\":{\"fallback_url\":\"https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback\",\"height\":1080,\"width\":608,\"scrubber_media_url\":\"https://v.redd.it/abcabcabcabc/DASH_96\",\"dash_url\":\"https://v.redd.it/abcabcabcabc/DASHPlaylist.mpd\",\"duration\":8,\"hls_url\":\"https://v.redd.it/abcabcabcabc/HLSPlaylist.m3u8\",\"is_gif\":false,\"transcoding_status\":\"completed\"}}";
 
@@ -53,6 +54,47 @@ namespace RedditVideoRotationBotTests
 
             // Act + Assert
             Invoking(() => RedditPostParser.TryGetVideoUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
+        }
+
+        [Fact]
+        public void GivenRedditPostWithAudio_WhenAudioUrlIsParsedFromPost_ThenUrlIsReturnedSuccessfully()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse(MediaString)
+            };
+
+            // Act
+            var url = RedditPostParser.TryGetAudioUrlFromPost(post);
+
+            // Assert
+            Assert.Equal(AudioUrlString, url);
+        }
+
+        [Fact]
+        public void GivenRedditPostWithNoAudio_WhenAudioUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
+        {
+            // Arrange
+            var post = new Post();
+
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetAudioUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
+        }
+
+        [Fact]
+        public void GivenRedditPostWithNonVideoMedia_WhenAudioUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse("{\"some_other_media\":{\"data\":\"value\"}}")
+            };
+
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetAudioUrlFromPost(post))
                 .Should().Throw<RedditPostParserException>();
         }
     }
