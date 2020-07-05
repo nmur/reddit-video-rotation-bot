@@ -55,5 +55,46 @@ namespace RedditVideoRotationBotTests
             Invoking(() => RedditPostParser.TryGetVideoUrlFromPost(post))
                 .Should().Throw<RedditPostParserException>();
         }
+
+        [Fact]
+        public void GivenRedditPostWithAudio_WhenAudioUrlIsParsedFromPost_ThenUrlIsReturnedSuccessfully()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse(MediaString)
+            };
+
+            // Act
+            var url = RedditPostParser.TryGetAudioUrlFromPost(post);
+
+            // Assert
+            Assert.Equal(AudioUrlString, url);
+        }
+
+        [Fact]
+        public void GivenRedditPostWithNoAudio_WhenAudioUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
+        {
+            // Arrange
+            var post = new Post();
+
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetAudioUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
+        }
+
+        [Fact]
+        public void GivenRedditPostWithNonVideoMedia_WhenAudioUrlIsParsedFromPost_ThenRedditPostParserExceptionIsThrown()
+        {
+            // Arrange
+            var post = new Post
+            {
+                Media = JObject.Parse("{\"some_other_media\":{\"data\":\"value\"}}")
+            };
+
+            // Act + Assert
+            Invoking(() => RedditPostParser.TryGetAudioUrlFromPost(post))
+                .Should().Throw<RedditPostParserException>();
+        }
     }
 }
