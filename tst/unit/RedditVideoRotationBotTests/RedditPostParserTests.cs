@@ -16,7 +16,7 @@ namespace RedditVideoRotationBotTests
 
         private const string AudioUrlString = "https://v.redd.it/abcabcabcabc/audio";
 
-        private const string AudioUrlVariationString = "https://v.redd.it/abcabcabcabc/DASH_audio.mp4?source=fallback";
+        private const string AudioUrlVariationString = "https://v.redd.it/abcabcabcabc/DASH_audio.mp4";
 
         private const string MediaString = "{\"reddit_video\":{\"fallback_url\":\"https://v.redd.it/abcabcabcabc/DASH_1080?source=fallback\",\"height\":1080,\"width\":608,\"scrubber_media_url\":\"https://v.redd.it/abcabcabcabc/DASH_96\",\"dash_url\":\"https://v.redd.it/abcabcabcabc/DASHPlaylist.mpd\",\"duration\":8,\"hls_url\":\"https://v.redd.it/abcabcabcabc/HLSPlaylist.m3u8\",\"is_gif\":false,\"transcoding_status\":\"completed\"}}";
 

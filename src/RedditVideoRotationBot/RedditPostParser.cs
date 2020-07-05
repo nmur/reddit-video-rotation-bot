@@ -12,6 +12,8 @@ namespace RedditVideoRotationBot
 
         private const string AudioResourceString = "audio";
 
+        private const string AudioResourceVariationString = "DASH_audio.mp4";
+
         public static string TryGetVideoUrlFromPost(Post post)
         {
             try
@@ -27,7 +29,14 @@ namespace RedditVideoRotationBot
         }
         public static string TryGetAudioUrlFromPost(Post post)
         {
-            return TryGetVideoUrlFromPost(post).Split(VideoResourcePrefix)[0] + AudioResourceString;
+            var videoUrlSplitOnResourcePrefix = TryGetVideoUrlFromPost(post).Split(VideoResourcePrefix);
+            return videoUrlSplitOnResourcePrefix[0] + GetAudioResourceString(videoUrlSplitOnResourcePrefix);
+        }
+
+        private static string GetAudioResourceString(string[] videoUrlSplitOnResourcePrefix)
+        {
+            //https://github.com/nmur/reddit-video-rotation-bot/issues/27#issuecomment-653887291
+            return videoUrlSplitOnResourcePrefix[1].Contains(".mp4") ? AudioResourceVariationString : AudioResourceString;
         }
     }
 
