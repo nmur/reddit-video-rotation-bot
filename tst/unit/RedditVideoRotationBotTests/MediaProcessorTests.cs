@@ -15,6 +15,10 @@ namespace RedditVideoRotationBotTests
 
         private const string AudioUrlString = "https://v.redd.it/abcabcabcabc/audio";
 
+        private const string RotationArgumentString = "cw";
+
+        private const string UploadUrl = "https://giant.gfycat.com/SomeVideoUrl.mp4";
+
         private readonly IVideoDownloader _fakeVideoDownloader;
 
         private readonly IAudioDownloader _fakeAudioDownloader;
@@ -38,6 +42,24 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
+        public async Task GivenValidMediaProcessorParameters_WhenAllOperationsSucceed_ThenUrlOfUploadedVideoIsReturned()
+        {
+            // Arrange
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Returns(UploadUrl);
+
+            // Act
+            var uploadUrl = await _mediaProcessor.DownloadAndRotateAndUploadVideo(GetValidMediaProcessorParameters());
+
+            // Assert
+            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaMuxer.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeVideoRotator.Rotate(RotationArgumentString)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
+            Assert.Equal(UploadUrl, uploadUrl);
+        }
+
+        [Fact]
         public void GivenValidMediaProcessorParameters_WhenVideoDownloadFails_ThenMediaProcessingStops()
         {
             // Arrange
@@ -49,7 +71,7 @@ namespace RedditVideoRotationBotTests
             // Assert
             A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
             A.CallTo(() => _fakeMediaMuxer.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
+            A.CallTo(() => _fakeVideoRotator.Rotate(RotationArgumentString)).MustNotHaveHappened();
             A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
         }
 
@@ -82,7 +104,7 @@ namespace RedditVideoRotationBotTests
             {
                 AudioUrl = AudioUrlString,
                 VideoUrl = VideoUrlString,
-                RotationArgument = "cw"
+                RotationArgument = RotationArgumentString
             };
         }
     }

@@ -8,8 +8,6 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using RedditVideoRotationBot.Exceptions;
-using System;
-using System.Linq.Expressions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -183,6 +181,21 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
             A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenMediaProcessingFails_ThenCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).Throws<MediaProcessorException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
         }
 
         [Fact]
