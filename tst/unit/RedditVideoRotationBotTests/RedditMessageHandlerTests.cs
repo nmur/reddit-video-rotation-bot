@@ -170,106 +170,35 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
         }
 
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-        //    A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<VideoDownloadException>();
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionOnNsfwMediaPost_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostMarkedAsNsfw();
 
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
-        //    // Assert
-        //    AssertNumberOfReadMessages(1);
-        //    AssertNumberOfRepliedToComments(0);
-        //    A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeMediaMuxer.CombineVideoAndAudio()).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        //}
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
+        }
 
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenVideoRotateFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-        //    A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).Throws<VideoRotateException>();
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionWithNoRotationArgument_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument();
 
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
 
-        //    // Assert
-        //    AssertNumberOfReadMessages(1);
-        //    AssertNumberOfRepliedToComments(0);
-        //    A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        //}
-
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenVideoUploadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-        //    A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<VideoUploadException>();
-
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-        //    // Assert
-        //    AssertNumberOfReadMessages(1);
-        //    AssertNumberOfRepliedToComments(0);
-        //}
-
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionOnNsfwMediaPost_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageOnPostMarkedAsNsfw();
-
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-        //    // Assert
-        //    AssertNumberOfReadMessages(1);
-        //    AssertNumberOfRepliedToComments(0);
-        //    A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeMediaMuxer.CombineVideoAndAudio()).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        //}
-
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionWithNoRotationArgument_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessageWithNoRotationArgument();
-
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-        //    // Assert
-        //    AssertNumberOfReadMessages(1);
-        //    AssertNumberOfRepliedToComments(0);
-        //    A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeMediaMuxer.CombineVideoAndAudio()).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-        //    A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        //}
-
-        //[Fact]
-        //public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionNoRotationArgument_ThenVideoRotatorIsGivenRotationArgument()
-        //{
-        //    // Arrange
-        //    var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-
-        //    // Act
-        //    await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-        //    // Assert
-        //    A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappened();
-        //}
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
+        }
 
         private void SetupCommentRootPostStubs()
         {

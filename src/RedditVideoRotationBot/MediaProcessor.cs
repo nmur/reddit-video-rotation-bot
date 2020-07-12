@@ -1,4 +1,5 @@
-﻿using RedditVideoRotationBot.Interfaces;
+﻿using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -34,12 +35,19 @@ namespace RedditVideoRotationBot
 
         public async Task<string> DownloadAndRotateAndUploadVideo(MediaProcessorParameters mediaProcessorParameters)
         {
-            DeleteMediaFilesIfPresent();
-            DownloadVideoFromUrl(mediaProcessorParameters.VideoUrl);
-            DownloadAudioFromUrl(mediaProcessorParameters.AudioUrl);
-            CombineVideoAndAudio();
-            RotateVideo(mediaProcessorParameters.RotationArgument);
-            return await UploadVideoAsync();
+            try
+            {
+                DeleteMediaFilesIfPresent();
+                DownloadVideoFromUrl(mediaProcessorParameters.VideoUrl);
+                DownloadAudioFromUrl(mediaProcessorParameters.AudioUrl);
+                CombineVideoAndAudio();
+                RotateVideo(mediaProcessorParameters.RotationArgument);
+                return await UploadVideoAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new MediaProcessorException("Error during download or rotate or upload", ex);
+            }
         }
 
         private static void DeleteMediaFilesIfPresent()
