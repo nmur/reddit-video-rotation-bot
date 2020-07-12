@@ -53,11 +53,11 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulApiCallStubs();
 
             // Act
-            var gfyCatName = await _gfyCatVideoUploader.UploadAsync();
+            var gfyCatUrl = await _gfyCatVideoUploader.UploadAsync();
 
             // Assert
             A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();
-            Assert.Equal($"https://giant.gfycat.com/{FakeGfyName}.mp4", gfyCatName);
+            Assert.Equal($"https://giant.gfycat.com/{FakeGfyName}.mp4", gfyCatUrl);
         }
 
         [Fact]
@@ -68,11 +68,11 @@ namespace RedditVideoRotationBotTests
             SetupSuccessfulDuplicateApiCallStubs();
 
              // Act
-             var gfyCatName = await _gfyCatVideoUploader.UploadAsync();
+             var gfyCatUrl = await _gfyCatVideoUploader.UploadAsync();
 
             // Assert
             A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();
-            Assert.Equal($"https://giant.gfycat.com/{FakeGfyNameDuplicate}.mp4", gfyCatName);
+            Assert.Equal($"https://giant.gfycat.com/{FakeGfyNameDuplicate}.mp4", gfyCatUrl);
         }
 
         [Fact]
@@ -104,6 +104,20 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             await uploadAction.Should().ThrowAsync<VideoUploadTimeOutException>();
+        }
+
+        [Fact]
+        public async Task GivenRotatedVideoExists_WhenVideoUploadIsCalledAndIsSuccessful_ThenVideoFileDeletedAfterUpload()
+        {
+            // Arrange
+            CreateRotatedVideoFile();
+            SetupSuccessfulApiCallStubs();
+
+            // Act
+            var gfyCatName = await _gfyCatVideoUploader.UploadAsync();
+
+            // Assert
+            Assert.False(File.Exists(FakeGfyName));
         }
 
         private void SetupSuccessfulApiCallStubs()

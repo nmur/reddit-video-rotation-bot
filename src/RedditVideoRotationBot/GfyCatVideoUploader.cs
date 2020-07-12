@@ -58,6 +58,7 @@ namespace RedditVideoRotationBot
             var task = GetWaitForVideoUploadToCompleteTask(gfyName);
             if (task.Wait(_gfyCatApiConfiguration.GetUploadTimeoutInMs()))
             {
+                DeleteVideoFile(gfyName);
                 return await GetMp4UrlForGfyName(gfyName);
             }
             else
@@ -75,6 +76,11 @@ namespace RedditVideoRotationBot
         private static void RenameRotatedVideoFileToGfyName(string gfyName)
         {
             File.Move("video_rotated.mp4", gfyName);
+        }
+
+        private static void DeleteVideoFile(string gfyName)
+        {
+            if (File.Exists(gfyName)) File.Delete(gfyName);
         }
 
         private async Task<string> GetMp4UrlForGfyName(string gfyName)
