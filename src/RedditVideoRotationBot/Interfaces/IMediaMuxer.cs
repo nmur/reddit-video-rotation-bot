@@ -1,6 +1,6 @@
 ﻿namespace RedditVideoRotationBot
 {
-    public interface IMediaProcessor
+    public interface IMediaMuxer
     {
         void CombineVideoAndAudio();
     }

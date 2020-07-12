@@ -15,7 +15,7 @@ namespace RedditVideoRotationBot
 
         private readonly IAudioDownloader _audioDownloader;
 
-        private readonly IMediaProcessor _mediaProcessor;
+        private readonly IMediaMuxer _mediaMuxer;
 
         private readonly IVideoRotator _videoRotator;
 
@@ -29,13 +29,12 @@ namespace RedditVideoRotationBot
 
         private const string RotatedVideoFileNameString = "video_rotated.mp4";
 
-        //TODO: refactor: separate the reddit/video responsibilities
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IMediaProcessor mediaProcessor, IVideoRotator videoRotator, IVideoUploader videoUploader)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IMediaMuxer mediaMuxer, IVideoRotator videoRotator, IVideoUploader videoUploader)
         {
             _redditClientWrapper = redditClientWrapper;
             _videoDownloader = videoDownloader;
             _audioDownloader = audioDownloader;
-            _mediaProcessor = mediaProcessor;
+            _mediaMuxer = mediaMuxer;
             _videoRotator = videoRotator;
             _videoUploader = videoUploader;
         }
@@ -69,27 +68,33 @@ namespace RedditVideoRotationBot
 
         private async Task RotateAndUploadVideo(Message message)
         {
-            var messageBodySplitIntoWords = message.Body.Split(' ');
-            if (messageBodySplitIntoWords.Length < 2)
-                throw new ArgumentNullException("Rotation argument missing from user mention.");
-
-            var rotationArgument = messageBodySplitIntoWords[1];
+            var rotationArgument = GetRotationArgument(message);
 
             var post = GetCommentRootPost(message);
             ThrowExceptionIfPostIsNsfw(post);
-            string videoUrl = GetVideoUrlFromPost(post);
-            string audioUrl = GetAudioUrlFromPost(post);
 
             //delete video file if there's one already. only process one file at a time for now
             DeleteMediaFilesIfPresent();
 
+            string videoUrl = GetVideoUrlFromPost(post);
+            string audioUrl = GetAudioUrlFromPost(post);
+
             _videoDownloader.DownloadFromUrl(videoUrl);
             _audioDownloader.DownloadFromUrl(audioUrl);
-            _mediaProcessor.CombineVideoAndAudio();
+            _mediaMuxer.CombineVideoAndAudio();
             _videoRotator.Rotate(rotationArgument);
             var uploadedVideoUrl = await _videoUploader.UploadAsync();
 
             ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
+        }
+
+        private static string GetRotationArgument(Message message)
+        {
+            var messageBodySplitIntoWords = message.Body.Split(' ');
+            if (messageBodySplitIntoWords.Length < 2)
+                throw new ArgumentNullException("Rotation argument missing from user mention.");
+
+            return messageBodySplitIntoWords[1];
         }
 
         private static void ThrowExceptionIfPostIsNsfw(Post post)
