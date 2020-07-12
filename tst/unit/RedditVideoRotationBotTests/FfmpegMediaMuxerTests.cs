@@ -10,7 +10,7 @@ using FluentAssertions;
 
 namespace RedditVideoRotationBotTests
 {
-    public class FfmpegMediaProcessorTests : IDisposable
+    public class FfmpegMediaMuxerTests : IDisposable
     {
         private const string VideoFileName = "video.mp4";
 
@@ -18,13 +18,13 @@ namespace RedditVideoRotationBotTests
 
         private readonly IFfmpegExecutor _fakeFfmpegExecutor;
 
-        private readonly IMediaProcessor _FfmpegMediaProcessor;
+        private readonly IMediaMuxer _FfmpegMediaMuxer;
 
-        public FfmpegMediaProcessorTests()
+        public FfmpegMediaMuxerTests()
         {
             DeleteTestFiles();
             _fakeFfmpegExecutor = A.Fake<IFfmpegExecutor>();
-            _FfmpegMediaProcessor = new FfmpegMediaProcessor(_fakeFfmpegExecutor);
+            _FfmpegMediaMuxer = new FfmpegMediaMuxer(_fakeFfmpegExecutor);
         }
 
         public void Dispose()
@@ -40,7 +40,7 @@ namespace RedditVideoRotationBotTests
             CreateAudioFile();
 
             // Act
-            _FfmpegMediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaMuxer.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustHaveHappenedOnceExactly();
@@ -53,7 +53,7 @@ namespace RedditVideoRotationBotTests
             CreateVideoFile();
 
             // Act
-            _FfmpegMediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaMuxer.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustNotHaveHappened();
@@ -66,7 +66,7 @@ namespace RedditVideoRotationBotTests
             CreateAudioFile();
 
             // Act
-            _FfmpegMediaProcessor.CombineVideoAndAudio();
+            _FfmpegMediaMuxer.CombineVideoAndAudio();
 
             // Assert
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).MustNotHaveHappened();
@@ -81,7 +81,7 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeFfmpegExecutor.ExecuteFfmpegCommandWithArgString(A<string>._)).Throws<Exception>();
 
             // Act + Assert
-            Invoking(() => _FfmpegMediaProcessor.CombineVideoAndAudio()).Should().NotThrow();
+            Invoking(() => _FfmpegMediaMuxer.CombineVideoAndAudio()).Should().NotThrow();
         }
 
         private static void CreateVideoFile()

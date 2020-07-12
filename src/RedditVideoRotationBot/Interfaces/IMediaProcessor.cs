@@ -1,7 +1,9 @@
-﻿namespace RedditVideoRotationBot
+﻿using System.Threading.Tasks;
+
+namespace RedditVideoRotationBot.Interfaces
 {
     public interface IMediaProcessor
     {
-        void CombineVideoAndAudio();
+        Task<string> DownloadAndRotateAndUploadVideo(MediaProcessorParameters mediaProcessorParameters);
     }
 }

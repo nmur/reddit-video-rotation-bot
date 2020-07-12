@@ -11,38 +11,19 @@ namespace RedditVideoRotationBot
     {
         private readonly IRedditClientWrapper _redditClientWrapper;
 
-        private readonly IVideoDownloader _videoDownloader;
-
-        private readonly IAudioDownloader _audioDownloader;
-
         private readonly IMediaProcessor _mediaProcessor;
-
-        private readonly IVideoRotator _videoRotator;
-
-        private readonly IVideoUploader _videoUploader;
 
         private const string UsernameMentionSubjectString = "username mention";
 
-        private const string VideoFileNameString = "video.mp4";
-
-        private const string AudioFileNameString = "audio.mp4";
-
-        private const string RotatedVideoFileNameString = "video_rotated.mp4";
-
-        //TODO: refactor: separate the reddit/video responsibilities
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IVideoDownloader videoDownloader, IAudioDownloader audioDownloader, IMediaProcessor mediaProcessor, IVideoRotator videoRotator, IVideoUploader videoUploader)
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IMediaProcessor mediaProcessor)
         {
             _redditClientWrapper = redditClientWrapper;
-            _videoDownloader = videoDownloader;
-            _audioDownloader = audioDownloader;
             _mediaProcessor = mediaProcessor;
-            _videoRotator = videoRotator;
-            _videoUploader = videoUploader;
         }
 
         public async Task OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
         {
-            if (e == null || e.NewMessages == null) return;
+            if (NoMessagesInEvent(e)) return;
 
             foreach (var message in e.NewMessages)
             {
@@ -62,6 +43,11 @@ namespace RedditVideoRotationBot
             }
         }
 
+        private static bool NoMessagesInEvent(MessagesUpdateEventArgs e)
+        {
+            return e == null || e.NewMessages == null;
+        }
+
         private static bool MessageIsUsernameMention(Message message)
         {
             return message.Subject == UsernameMentionSubjectString && message.WasComment;
@@ -69,27 +55,32 @@ namespace RedditVideoRotationBot
 
         private async Task RotateAndUploadVideo(Message message)
         {
+            var rotationArgument = GetRotationArgument(message);
+
+            var post = GetCommentRootPost(message);
+            ThrowExceptionIfPostIsNsfw(post);
+
+            string videoUrl = GetVideoUrlFromPost(post);
+            string audioUrl = GetAudioUrlFromPost(post);
+
+            var uploadedVideoUrl = await _mediaProcessor.DownloadAndRotateAndUploadVideo(
+                new MediaProcessorParameters
+                {
+                    RotationArgument = rotationArgument,
+                    VideoUrl = videoUrl,
+                    AudioUrl = audioUrl
+                });
+
+            ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
+        }
+
+        private static string GetRotationArgument(Message message)
+        {
             var messageBodySplitIntoWords = message.Body.Split(' ');
             if (messageBodySplitIntoWords.Length < 2)
                 throw new ArgumentNullException("Rotation argument missing from user mention.");
 
-            var rotationArgument = messageBodySplitIntoWords[1];
-
-            var post = GetCommentRootPost(message);
-            ThrowExceptionIfPostIsNsfw(post);
-            string videoUrl = GetVideoUrlFromPost(post);
-            string audioUrl = GetAudioUrlFromPost(post);
-
-            //delete video file if there's one already. only process one file at a time for now
-            DeleteMediaFilesIfPresent();
-
-            _videoDownloader.DownloadFromUrl(videoUrl);
-            _audioDownloader.DownloadFromUrl(audioUrl);
-            _mediaProcessor.CombineVideoAndAudio();
-            _videoRotator.Rotate(rotationArgument);
-            var uploadedVideoUrl = await _videoUploader.UploadAsync();
-
-            ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
+            return messageBodySplitIntoWords[1];
         }
 
         private static void ThrowExceptionIfPostIsNsfw(Post post)
@@ -117,13 +108,6 @@ namespace RedditVideoRotationBot
         {
             _redditClientWrapper.ReadMessage(GetMessageFullname(message));
             Console.WriteLine($"Message was marked as read");
-        }
-
-        private static void DeleteMediaFilesIfPresent()
-        {
-            if (File.Exists(VideoFileNameString)) File.Delete(VideoFileNameString);
-            if (File.Exists(AudioFileNameString)) File.Delete(AudioFileNameString);
-            if (File.Exists(RotatedVideoFileNameString)) File.Delete(RotatedVideoFileNameString);
         }
 
         private void ReplyToCommentWithUploadedVideoUrl(Message message, string url)

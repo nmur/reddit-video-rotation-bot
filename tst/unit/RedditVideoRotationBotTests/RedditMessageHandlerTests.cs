@@ -41,28 +41,16 @@ namespace RedditVideoRotationBotTests
 
         private readonly IRedditClientWrapper _fakeRedditClientWrapper;
 
-        private readonly IVideoDownloader _fakeVideoDownloader;
-
-        private readonly IAudioDownloader _fakeAudioDownloader;
-
         private readonly IMediaProcessor _fakeMediaProcessor;
 
-        private readonly IVideoRotator _fakeVideoRotator;
-
         private readonly IRedditMessageHandler _redditMessageHandler;
-
-        private readonly IVideoUploader _fakeGfyCatVideoUploader;
 
         public RedditMessageHandlerTests()
         {
             _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
             SetupCommentRootPostStubs();
-            _fakeVideoDownloader = A.Fake<IVideoDownloader>();
-            _fakeAudioDownloader = A.Fake<IAudioDownloader>();
             _fakeMediaProcessor = A.Fake<IMediaProcessor>();
-            _fakeVideoRotator = A.Fake<IVideoRotator>();
-            _fakeGfyCatVideoUploader = A.Fake<IVideoUploader>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeVideoDownloader, _fakeAudioDownloader, _fakeMediaProcessor, _fakeVideoRotator, _fakeGfyCatVideoUploader);
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeMediaProcessor);
         }
 
         [Theory]
@@ -95,11 +83,7 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             A.CallTo(() => _fakeRedditClientWrapper.ReadMessage(PrivateMessageFullname)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -115,11 +99,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(GetValidMediaProcessorMatcher())).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -135,11 +115,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfReadMessages(2);
             AssertNumberOfRepliedToComments(2);
             AssertTwoUsernameMentionsWereMarkedReadAndRepliedTo();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(GetValidMediaProcessorMatcher())).MustHaveHappenedTwiceExactly();
         }
 
         [Fact]
@@ -156,11 +132,7 @@ namespace RedditVideoRotationBotTests
             AssertNumberOfRepliedToComments(1);
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(GetValidMediaProcessorMatcher())).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -178,11 +150,7 @@ namespace RedditVideoRotationBotTests
             AssertOneUsernameMentionWasMarkedReadAndRepliedTo();
             AssertOnePrivateMessageWasMarkedRead();
             AssertOneCommentReplyWasMarkedRead();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(GetValidMediaProcessorMatcher())).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -197,61 +165,7 @@ namespace RedditVideoRotationBotTests
             // Assert
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task GivenRedditMessageHandler_WhenVideoDownloadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        {
-            // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).Throws<VideoDownloadException>();
-
-            // Act
-            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            AssertNumberOfReadMessages(1);
-            AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task GivenRedditMessageHandler_WhenVideoRotateFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        {
-            // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).Throws<VideoRotateException>();
-
-            // Act
-            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            AssertNumberOfReadMessages(1);
-            AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task GivenRedditMessageHandler_WhenVideoUploadFails_ThenNoVideoIsProcessedAndCommentWasNotRepliedToAndCommentWasMarkedRead()
-        {
-            // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).Throws<VideoUploadException>();
-
-            // Act
-            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            AssertNumberOfReadMessages(1);
-            AssertNumberOfRepliedToComments(0);
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
         }
 
         [Fact]
@@ -266,11 +180,22 @@ namespace RedditVideoRotationBotTests
             // Assert
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenMediaProcessingFails_ThenCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).Throws<MediaProcessorException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
         }
 
         [Fact]
@@ -285,24 +210,7 @@ namespace RedditVideoRotationBotTests
             // Assert
             AssertNumberOfReadMessages(1);
             AssertNumberOfRepliedToComments(0);
-            A.CallTo(() => _fakeVideoDownloader.DownloadFromUrl(VideoUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeAudioDownloader.DownloadFromUrl(AudioUrlString)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMediaProcessor.CombineVideoAndAudio()).MustNotHaveHappened();
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustNotHaveHappened();
-            A.CallTo(() => _fakeGfyCatVideoUploader.UploadAsync()).MustNotHaveHappened();
-        }
-
-        [Fact]
-        public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionNoRotationArgument_ThenVideoRotatorIsGivenRotationArgument()
-        {
-            // Arrange
-            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-
-            // Act
-            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
-
-            // Assert
-            A.CallTo(() => _fakeVideoRotator.Rotate(A<string>._)).MustHaveHappened();
+            A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).MustNotHaveHappened();
         }
 
         private void SetupCommentRootPostStubs()
@@ -312,6 +220,29 @@ namespace RedditVideoRotationBotTests
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(CommentReplyFullname)).Returns(GetPostWithVideoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionWithNoMediaFullname)).Returns(GetPostWithNoMedia());
             A.CallTo(() => _fakeRedditClientWrapper.GetCommentRootPost(UsernameMentionOnNsfwPostFullname)).Returns(GetNsfwPostWithVideoMedia());
+        }
+
+        private MediaProcessorParameters GetValidMediaProcessorParameters()
+        {
+            return new MediaProcessorParameters
+            {
+                AudioUrl = AudioUrlString,
+                VideoUrl = VideoUrlString,
+                RotationArgument = "cw"
+            };
+        }
+
+        private MediaProcessorParameters GetValidMediaProcessorMatcher()
+        {
+            return A<MediaProcessorParameters>.That.Matches(m => MatchWithValidMediaProcessorParameters(m));
+        }
+
+        private bool MatchWithValidMediaProcessorParameters(MediaProcessorParameters mediaProcessorParameters)
+        {
+            var validMediaProcessorParameters = GetValidMediaProcessorParameters();
+            return validMediaProcessorParameters.VideoUrl == mediaProcessorParameters.VideoUrl &&
+                validMediaProcessorParameters.AudioUrl == mediaProcessorParameters.AudioUrl &&
+                validMediaProcessorParameters.RotationArgument == mediaProcessorParameters.RotationArgument;
         }
 
         private static Reddit.Controllers.Post GetPostWithVideoMedia()
