@@ -5,6 +5,7 @@ using Reddit.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace RedditVideoRotationBot
 {
@@ -47,9 +48,23 @@ namespace RedditVideoRotationBot
             }
         }
 
+        //TODO: clean up/unit test/pull reddit action retries into a decorator
         public Post GetCommentRootPost(string id)
         {
-            return _redditClient.Comment(id).GetRoot();
+            var tries = 15;
+            while (tries > 0)
+            {
+                try
+                {
+                    return _redditClient.Comment(id).GetRoot(id);
+                }
+                catch (Exception)
+                {
+                    if (tries-- <= 0) break;
+                    Thread.Sleep(10000);
+                }
+            }
+            throw new Exception("Failed to find root post of comment.");
         }
 
         // This method deals with https://github.com/sirkris/Reddit.NET/issues/105
