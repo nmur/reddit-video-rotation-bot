@@ -49,7 +49,7 @@ namespace RedditVideoRotationBot
 
         public Post GetCommentRootPost(string id)
         {
-            return _redditClient.Comment(id).GetRoot(id);
+            return _redditClient.Comment(id).GetRoot();
         }
 
         // This method deals with https://github.com/sirkris/Reddit.NET/issues/105
