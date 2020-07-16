@@ -9,7 +9,9 @@ In a Reddit video post, create a reply with a user mention of the bot (currently
 For example, to request a video to be rotated clockwise:  
 > /u/video-rotator cw  
 
-Other usage instructions, as well as a full list of rotational parameters can be found [here](https://github.com/nmur/reddit-video-rotation-bot/wiki/Detailed-usage-instructions).
+Other usage instructions, as well as a full list of rotational parameters can be found [here](https://github.com/nmur/reddit-video-rotation-bot/wiki/Detailed-usage-instructions).  
+  
+Currently, videos from NSFW posts are not supported, mostly because Gfycat does not allow NSFW content anymore.
 
 ## Running your own instance of the bot
 1. Create a Reddit account that the bot will use to respond to posts (or use your personal account).
