@@ -4,10 +4,12 @@
 A summonable Reddit bot that rotates videos.
 
 ## Usage
-In a Reddit video post, create a reply with a user mention of the bot, eg.  
-> /u/video-rotator   
+In a Reddit video post, create a reply with a user mention of the bot (currently [/u/video-rotator](https://www.reddit.com/user/video-rotator)), followed by the requested rotation.
 
-Currently the username of the bot is [/u/video-rotator](https://www.reddit.com/user/video-rotator)
+For example, to request a video to be rotated clockwise:  
+> /u/video-rotator cw  
+
+Other usage instructions, as well as a full list of rotational parameters can be found [here](https://github.com/nmur/reddit-video-rotation-bot/wiki/Detailed-usage-instructions).
 
 ## Running your own instance of the bot
 1. Create a Reddit account that the bot will use to respond to posts (or use your personal account).
