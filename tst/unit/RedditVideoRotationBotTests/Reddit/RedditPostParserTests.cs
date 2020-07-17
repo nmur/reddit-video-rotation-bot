@@ -1,10 +1,10 @@
 ﻿using Xunit;
 using Reddit.Things;
 using Newtonsoft.Json.Linq;
-using RedditVideoRotationBot;
 using RedditVideoRotationBot.Exceptions;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
+using RedditVideoRotationBot.Reddit;
 
 namespace RedditVideoRotationBotTests
 {

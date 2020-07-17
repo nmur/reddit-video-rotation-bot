@@ -4,6 +4,8 @@ using static FluentAssertions.FluentActions;
 using FluentAssertions;
 using RedditVideoRotationBot.Exceptions;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Media.Ffmpeg;
+using RedditVideoRotationBot.Reddit;
 
 namespace RedditVideoRotationBotTests
 {
@@ -34,7 +36,7 @@ namespace RedditVideoRotationBotTests
         public void GivenUploadedVideoUrlAndRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyIsReturnedSuccessfully()
         {
             // Arrange
-            var replyBuilderParameters = new ReplyBuilderParameters
+            var replyBuilderParameters = new RedditReplyBuilderParameters
             {
                 UploadedVideoUrl = UploadedVideoUrl,
                 RotationMessageArg = RotationMessageArg
@@ -53,7 +55,7 @@ namespace RedditVideoRotationBotTests
         public void GivenAnInvalidUploadedVideoUrlAndValidRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
         {
             // Arrange
-            var replyBuilderParameters = new ReplyBuilderParameters
+            var replyBuilderParameters = new RedditReplyBuilderParameters
             {
                 UploadedVideoUrl = invalidUrl,
                 RotationMessageArg = RotationMessageArg
@@ -70,7 +72,7 @@ namespace RedditVideoRotationBotTests
         public void GivenValidUploadedVideoUrlAndInvalidRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidRotationMessageArg)
         {
             // Arrange
-            var replyBuilderParameters = new ReplyBuilderParameters
+            var replyBuilderParameters = new RedditReplyBuilderParameters
             {
                 UploadedVideoUrl = UploadedVideoUrl,
                 RotationMessageArg = invalidRotationMessageArg

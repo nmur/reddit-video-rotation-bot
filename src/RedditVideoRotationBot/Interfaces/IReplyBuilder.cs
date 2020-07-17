@@ -2,6 +2,6 @@
 {
     public interface IReplyBuilder
     {
-        string BuildReply(ReplyBuilderParameters replyBuilderParameters);
+        string BuildReply(RedditReplyBuilderParameters replyBuilderParameters);
     }
 }

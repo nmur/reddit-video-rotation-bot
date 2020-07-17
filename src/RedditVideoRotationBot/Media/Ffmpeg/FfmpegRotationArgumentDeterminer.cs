@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media.Ffmpeg
 {
     public static class FfmpegRotationArgumentDeterminer
     {

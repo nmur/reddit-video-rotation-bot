@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media
 {
     public class MediaProcessor : IMediaProcessor
     {

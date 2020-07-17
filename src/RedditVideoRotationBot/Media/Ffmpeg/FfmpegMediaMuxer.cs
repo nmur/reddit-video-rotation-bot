@@ -2,7 +2,7 @@
 using System;
 using System.IO;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media.Ffmpeg
 {
     public class FfmpegMediaMuxer : IMediaMuxer
     {

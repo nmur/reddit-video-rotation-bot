@@ -1,4 +1,4 @@
-﻿namespace RedditVideoRotationBot
+﻿namespace RedditVideoRotationBot.Media
 {
     public class MediaProcessorParameters
     {

@@ -1,10 +1,11 @@
 ﻿using Reddit.Controllers.EventArgs;
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Media;
 using System;
 using System.Threading.Tasks;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Reddit
 {
     public class RedditMessageHandler : IRedditMessageHandler
     {
@@ -73,7 +74,7 @@ namespace RedditVideoRotationBot
                     AudioUrl = audioUrl
                 });
 
-            ReplyToComment(message, _replyBuilder.BuildReply(new ReplyBuilderParameters
+            ReplyToComment(message, _replyBuilder.BuildReply(new RedditReplyBuilderParameters
             {
                 UploadedVideoUrl = uploadedVideoUrl,
                 RotationMessageArg = rotationArgument
@@ -91,7 +92,7 @@ namespace RedditVideoRotationBot
 
         private static void ThrowExceptionIfPostIsNsfw(Post post)
         {
-            if (post.Over18) 
+            if (post.Over18)
                 throw new NotImplementedException("NSFW posts will not be handled until NSFW media upload resource is implemented");
         }
 

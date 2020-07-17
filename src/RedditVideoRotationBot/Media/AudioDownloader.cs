@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media
 {
     [ExcludeFromCodeCoverage]
     public class AudioDownloader : IAudioDownloader

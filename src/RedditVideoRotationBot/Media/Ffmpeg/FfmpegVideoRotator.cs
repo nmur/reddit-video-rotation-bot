@@ -3,7 +3,7 @@ using RedditVideoRotationBot.Interfaces;
 using System;
 using System.IO;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media.Ffmpeg
 {
     public class FfmpegVideoRotator : IVideoRotator
     {

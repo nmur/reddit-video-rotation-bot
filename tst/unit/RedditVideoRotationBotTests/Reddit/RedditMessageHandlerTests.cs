@@ -8,6 +8,8 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Media;
+using RedditVideoRotationBot.Reddit;
 
 namespace RedditVideoRotationBotTests
 {
@@ -206,7 +208,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<ReplyBuilderParameters>._)).Throws<RedditReplyBuilderException>();
+            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<RedditReplyBuilderParameters>._)).Throws<RedditReplyBuilderException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);

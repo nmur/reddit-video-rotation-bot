@@ -4,7 +4,7 @@ using Reddit.Things;
 using RedditVideoRotationBot.Exceptions;
 using System;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Reddit
 {
     public static class RedditPostParser
     {
@@ -19,7 +19,7 @@ namespace RedditVideoRotationBot
             try
             {
                 var mediaJObject = (JObject)post.Media;
-                var media = mediaJObject.ToObject<Media>();
+                var media = mediaJObject.ToObject<RedditMedia>();
                 return media.RedditVideo.FallbackUrl;
             }
             catch (Exception)
@@ -40,7 +40,7 @@ namespace RedditVideoRotationBot
         }
     }
 
-    internal class Media
+    internal class RedditMedia
     {
         [JsonProperty("reddit_video")]
         public RedditVideo RedditVideo;

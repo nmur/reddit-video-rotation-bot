@@ -1,6 +1,6 @@
 ﻿namespace RedditVideoRotationBot
 {
-    public class ReplyBuilderParameters
+    public class RedditReplyBuilderParameters
     {
         public string UploadedVideoUrl;
 

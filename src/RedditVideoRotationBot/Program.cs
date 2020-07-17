@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedditVideoRotationBot.Configurations;
+using RedditVideoRotationBot.Gfycat;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Media;
+using RedditVideoRotationBot.Media.Ffmpeg;
+using RedditVideoRotationBot.Reddit;
 using Refit;
 using System;
 using System.Diagnostics.CodeAnalysis;

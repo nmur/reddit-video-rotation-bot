@@ -2,9 +2,9 @@
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
 using System;
-using RedditVideoRotationBot;
+using RedditVideoRotationBot.Media.Ffmpeg;
 
-namespace RedditVideoRotationBotTests
+namespace RedditVideoRotationBotTests.Ffmpeg
 {
     public class FfmpegRotationArgumentDeterminerTests
     {

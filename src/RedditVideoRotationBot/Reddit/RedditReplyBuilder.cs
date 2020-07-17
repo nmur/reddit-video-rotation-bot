@@ -1,7 +1,7 @@
 ﻿using RedditVideoRotationBot.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Reddit
 {
     public class RedditReplyBuilder : IReplyBuilder
     {
@@ -20,7 +20,7 @@ namespace RedditVideoRotationBot
             _rotationDescriptionDeterminer = rotationDescriptionDeterminer;
         }
 
-        public string BuildReply(ReplyBuilderParameters replyBuilderParameters)
+        public string BuildReply(RedditReplyBuilderParameters replyBuilderParameters)
         {
             ValidateParameters(replyBuilderParameters);
 
@@ -30,7 +30,7 @@ namespace RedditVideoRotationBot
                 replyBuilderParameters.UploadedVideoUrl);
         }
 
-        private static void ValidateParameters(ReplyBuilderParameters replyBuilderParameters)
+        private static void ValidateParameters(RedditReplyBuilderParameters replyBuilderParameters)
         {
             if (string.IsNullOrEmpty(replyBuilderParameters.UploadedVideoUrl))
                 throw new RedditReplyBuilderException("Uploaded video URL was either null or empty");

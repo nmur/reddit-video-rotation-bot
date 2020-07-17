@@ -1,13 +1,13 @@
 ﻿using FakeItEasy;
-using RedditVideoRotationBot;
 using RedditVideoRotationBot.Exceptions;
 using RedditVideoRotationBot.Interfaces;
 using System.Threading.Tasks;
 using Xunit;
 using FluentAssertions;
 using static FluentAssertions.FluentActions;
+using RedditVideoRotationBot.Media;
 
-namespace RedditVideoRotationBotTests
+namespace RedditVideoRotationBotTests.Media
 {
     public class MediaProcessorTests
     {

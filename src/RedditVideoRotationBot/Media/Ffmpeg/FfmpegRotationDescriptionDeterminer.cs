@@ -1,7 +1,7 @@
 ﻿using RedditVideoRotationBot.Interfaces;
 using System;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media.Ffmpeg
 {
     public class FfmpegRotationDescriptionDeterminer : IRotationDescriptionDeterminer
     {

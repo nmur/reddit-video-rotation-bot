@@ -1,7 +1,7 @@
 ﻿using FakeItEasy;
 using FluentAssertions;
-using RedditVideoRotationBot;
 using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Gfycat;
 using RedditVideoRotationBot.Interfaces;
 using Refit;
 using System;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Xunit;
 [assembly: CollectionBehavior(DisableTestParallelization = true)] //until we get unique video file names
 
-namespace RedditVideoRotationBotTests
+namespace RedditVideoRotationBotTests.Gfycat
 {
     public class GfyCatVideoUploaderTests : IDisposable
     {
@@ -64,11 +64,11 @@ namespace RedditVideoRotationBotTests
         public async Task GivenRotatedVideoExistsAndVideoHasBeenPreviouslyUploaded_WhenVideoUploadIsCalled_ThenVideoFileIsUploadedAndPreviouslyUploadedVideoUrlIsReturned()
         {
             // Arrange
-            CreateRotatedVideoFile(); 
+            CreateRotatedVideoFile();
             SetupSuccessfulDuplicateApiCallStubs();
 
-             // Act
-             var gfyCatUrl = await _gfyCatVideoUploader.UploadAsync();
+            // Act
+            var gfyCatUrl = await _gfyCatVideoUploader.UploadAsync();
 
             // Assert
             A.CallTo(() => _fakeGfyCatFileDropApi.UploadVideoFromFile(FakeGfyName, A<StreamPart>._)).MustHaveHappenedOnceExactly();

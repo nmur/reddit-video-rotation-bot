@@ -1,11 +1,11 @@
-﻿using RedditVideoRotationBot;
-using Xunit;
+﻿using Xunit;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
 using System;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Media.Ffmpeg;
 
-namespace RedditVideoRotationBotTests
+namespace RedditVideoRotationBotTests.Ffmpeg
 {
     public class FfmpegRotationDescriptionDeterminerTests
     {
