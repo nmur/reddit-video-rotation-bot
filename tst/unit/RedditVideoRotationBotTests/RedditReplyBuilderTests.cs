@@ -2,6 +2,7 @@
 using Xunit;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
+using RedditVideoRotationBot.Exceptions;
 
 namespace RedditVideoRotationBotTests
 {

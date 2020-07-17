@@ -1,4 +1,5 @@
-﻿using RedditVideoRotationBot.Interfaces;
+﻿using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
 
 namespace RedditVideoRotationBot
 {
@@ -14,6 +15,9 @@ namespace RedditVideoRotationBot
 
         public string BuildReply(string uploadedVideoUrl)
         {
+            if (string.IsNullOrEmpty(uploadedVideoUrl))
+                throw new RedditReplyBuilderException("Uploaded video URL was either null or empty");
+
             return string.Format(ReplyTemplate, uploadedVideoUrl);
         }
     }
