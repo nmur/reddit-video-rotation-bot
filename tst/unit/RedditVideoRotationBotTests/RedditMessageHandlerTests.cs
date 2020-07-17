@@ -43,6 +43,8 @@ namespace RedditVideoRotationBotTests
 
         private readonly IMediaProcessor _fakeMediaProcessor;
 
+        private readonly IReplyBuilder _fakeReplyBuilder;
+
         private readonly IRedditMessageHandler _redditMessageHandler;
 
         public RedditMessageHandlerTests()
@@ -50,7 +52,8 @@ namespace RedditVideoRotationBotTests
             _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
             SetupCommentRootPostStubs();
             _fakeMediaProcessor = A.Fake<IMediaProcessor>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeMediaProcessor);
+            _fakeReplyBuilder = A.Fake<IReplyBuilder>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeMediaProcessor, _fakeReplyBuilder);
         }
 
         [Theory]
