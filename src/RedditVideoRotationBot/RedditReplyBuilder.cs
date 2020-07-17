@@ -15,10 +15,18 @@ namespace RedditVideoRotationBot
 
         public string BuildReply(ReplyBuilderParameters replyBuilderParameters)
         {
+            ValidateParameters(replyBuilderParameters);
+
+            return string.Format(ReplyTemplate, replyBuilderParameters.RotationDescription, replyBuilderParameters.UploadedVideoUrl);
+        }
+
+        private static void ValidateParameters(ReplyBuilderParameters replyBuilderParameters)
+        {
             if (string.IsNullOrEmpty(replyBuilderParameters.UploadedVideoUrl))
                 throw new RedditReplyBuilderException("Uploaded video URL was either null or empty");
 
-            return string.Format(ReplyTemplate, replyBuilderParameters.RotationDescription, replyBuilderParameters.UploadedVideoUrl);
+            if (string.IsNullOrEmpty(replyBuilderParameters.RotationDescription))
+                throw new RedditReplyBuilderException("Rotation description was either null or empty");
         }
     }
 }

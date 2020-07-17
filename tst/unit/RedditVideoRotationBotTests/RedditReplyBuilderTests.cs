@@ -41,7 +41,7 @@ namespace RedditVideoRotationBotTests
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void GivenAnInvalidUploadedVideoUrl_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
+        public void GivenAnInvalidUploadedVideoUrlAndValidRotationDescription_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
         {
             // Arrange
             var redditReplyBuilder = new RedditReplyBuilder();
@@ -49,6 +49,24 @@ namespace RedditVideoRotationBotTests
             {
                 UploadedVideoUrl = invalidUrl,
                 RotationDescription = RotationDescription
+            };
+
+            // Act + Assert
+            Invoking(() => redditReplyBuilder.BuildReply(replyBuilderParameters))
+                .Should().Throw<RedditReplyBuilderException>();
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void GivenValidUploadedVideoUrlAndInvalidRotationDescription_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidRotationDescription)
+        {
+            // Arrange
+            var redditReplyBuilder = new RedditReplyBuilder();
+            var replyBuilderParameters = new ReplyBuilderParameters
+            {
+                UploadedVideoUrl = UploadedVideoUrl,
+                RotationDescription = invalidRotationDescription
             };
 
             // Act + Assert
