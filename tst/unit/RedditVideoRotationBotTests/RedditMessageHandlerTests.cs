@@ -206,7 +206,7 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
-            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<string>._)).Throws<RedditReplyBuilderException>();
+            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<ReplyBuilderParameters>._)).Throws<RedditReplyBuilderException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);

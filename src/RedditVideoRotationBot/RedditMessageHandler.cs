@@ -74,7 +74,11 @@ namespace RedditVideoRotationBot
                     AudioUrl = audioUrl
                 });
 
-            ReplyToComment(message, _replyBuilder.BuildReply(uploadedVideoUrl));
+            ReplyToComment(message, _replyBuilder.BuildReply(new ReplyBuilderParameters
+            {
+                UploadedVideoUrl = uploadedVideoUrl,
+                RotationDescription = rotationArgument
+            }));
         }
 
         private static string GetRotationArgument(Message message)

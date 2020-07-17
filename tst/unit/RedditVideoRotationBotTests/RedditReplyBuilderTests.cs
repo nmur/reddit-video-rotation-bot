@@ -25,9 +25,14 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var redditReplyBuilder = new RedditReplyBuilder();
+            var replyBuilderParameters = new ReplyBuilderParameters
+            {
+                UploadedVideoUrl = UploadedVideoUrl,
+                RotationDescription = RotationDescription
+            };
 
             // Act
-            var reply = redditReplyBuilder.BuildReply(UploadedVideoUrl, RotationDescription);
+            var reply = redditReplyBuilder.BuildReply(replyBuilderParameters);
 
             // Assert
             Assert.Equal(CompletedReply, reply);
@@ -40,9 +45,14 @@ namespace RedditVideoRotationBotTests
         {
             // Arrange
             var redditReplyBuilder = new RedditReplyBuilder();
+            var replyBuilderParameters = new ReplyBuilderParameters
+            {
+                UploadedVideoUrl = invalidUrl,
+                RotationDescription = RotationDescription
+            };
 
             // Act + Assert
-            Invoking(() => redditReplyBuilder.BuildReply(invalidUrl))
+            Invoking(() => redditReplyBuilder.BuildReply(replyBuilderParameters))
                 .Should().Throw<RedditReplyBuilderException>();
         }
     }

@@ -2,6 +2,6 @@
 {
     public interface IReplyBuilder
     {
-        string BuildReply(string uploadedVideoUrl);
+        string BuildReply(ReplyBuilderParameters replyBuilderParameters);
     }
 }
