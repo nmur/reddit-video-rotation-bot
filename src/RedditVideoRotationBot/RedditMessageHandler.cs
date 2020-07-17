@@ -2,7 +2,6 @@
 using Reddit.Things;
 using RedditVideoRotationBot.Interfaces;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot
@@ -13,12 +12,16 @@ namespace RedditVideoRotationBot
 
         private readonly IMediaProcessor _mediaProcessor;
 
+        private readonly IReplyBuilder _replyBuilder;
+
         private const string UsernameMentionSubjectString = "username mention";
 
-        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IMediaProcessor mediaProcessor)
+
+        public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IMediaProcessor mediaProcessor, IReplyBuilder replyBuilder)
         {
             _redditClientWrapper = redditClientWrapper;
             _mediaProcessor = mediaProcessor;
+            _replyBuilder = replyBuilder;
         }
 
         public async Task OnUnreadMessagesUpdated(object sender, MessagesUpdateEventArgs e)
@@ -71,7 +74,7 @@ namespace RedditVideoRotationBot
                     AudioUrl = audioUrl
                 });
 
-            ReplyToCommentWithUploadedVideoUrl(message, uploadedVideoUrl);
+            ReplyToComment(message, _replyBuilder.BuildReply(uploadedVideoUrl));
         }
 
         private static string GetRotationArgument(Message message)
@@ -110,10 +113,10 @@ namespace RedditVideoRotationBot
             Console.WriteLine($"Message was marked as read");
         }
 
-        private void ReplyToCommentWithUploadedVideoUrl(Message message, string url)
+        private void ReplyToComment(Message message, string replyText)
         {
-            _redditClientWrapper.ReplyToComment(GetMessageFullname(message), url);
-            Console.WriteLine($"Comment was replied to");
+            _redditClientWrapper.ReplyToComment(GetMessageFullname(message), replyText);
+            Console.WriteLine("Comment was replied to");
         }
 
         private static string GetMessageFullname(Message message)
