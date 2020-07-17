@@ -8,6 +8,8 @@ using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Media;
+using RedditVideoRotationBot.Reddit;
 
 namespace RedditVideoRotationBotTests
 {
@@ -43,6 +45,8 @@ namespace RedditVideoRotationBotTests
 
         private readonly IMediaProcessor _fakeMediaProcessor;
 
+        private readonly IReplyBuilder _fakeReplyBuilder;
+
         private readonly IRedditMessageHandler _redditMessageHandler;
 
         public RedditMessageHandlerTests()
@@ -50,7 +54,8 @@ namespace RedditVideoRotationBotTests
             _fakeRedditClientWrapper = A.Fake<IRedditClientWrapper>();
             SetupCommentRootPostStubs();
             _fakeMediaProcessor = A.Fake<IMediaProcessor>();
-            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeMediaProcessor);
+            _fakeReplyBuilder = A.Fake<IReplyBuilder>();
+            _redditMessageHandler = new RedditMessageHandler(_fakeRedditClientWrapper, _fakeMediaProcessor, _fakeReplyBuilder);
         }
 
         [Theory]
@@ -189,6 +194,21 @@ namespace RedditVideoRotationBotTests
             // Arrange
             var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
             A.CallTo(() => _fakeMediaProcessor.DownloadAndRotateAndUploadVideo(A<MediaProcessorParameters>._)).Throws<MediaProcessorException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+        }
+
+        [Fact]
+        public async Task GivenRedditMessageHandler_WhenReplyBuildingFails_ThenCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<RedditReplyBuilderParameters>._)).Throws<RedditReplyBuilderException>();
 
             // Act
             await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);

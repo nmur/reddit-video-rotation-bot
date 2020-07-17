@@ -6,7 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Gfycat
 {
     public class GfyCatVideoUploader : IVideoUploader
     {
@@ -26,7 +26,7 @@ namespace RedditVideoRotationBot
         public async Task<string> UploadAsync()
         {
             string token = await GetAuthToken();
-            var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}", new GfyCatCreationParameters{KeepAudio = true});
+            var gfyCreationResponse = await _gfyCatApi.CreateGfy($"Bearer {token}", new GfyCatCreationParameters { KeepAudio = true });
 
             if (gfyCreationResponse.IsOk)
             {

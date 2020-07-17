@@ -7,7 +7,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Reddit
 {
     [ExcludeFromCodeCoverage] // Wrapper for RedditClient which has no Interface for unit testing
     public class RedditClientWrapper : IRedditClientWrapper

@@ -1,7 +1,7 @@
 using FakeItEasy;
 using Reddit.Controllers.EventArgs;
-using RedditVideoRotationBot;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Reddit;
 using Xunit;
 
 namespace RedditVideoRotationBotTests

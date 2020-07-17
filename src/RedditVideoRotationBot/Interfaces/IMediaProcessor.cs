@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using RedditVideoRotationBot.Media;
+using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot.Interfaces
 {

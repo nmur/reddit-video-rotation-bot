@@ -1,7 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RedditVideoRotationBot.Configurations;
+using RedditVideoRotationBot.Gfycat;
 using RedditVideoRotationBot.Interfaces;
+using RedditVideoRotationBot.Media;
+using RedditVideoRotationBot.Media.Ffmpeg;
+using RedditVideoRotationBot.Reddit;
 using Refit;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -55,6 +59,8 @@ namespace RedditVideoRotationBot
             services.AddSingleton<IMediaMuxer, FfmpegMediaMuxer>();
             services.AddSingleton<IVideoRotator, FfmpegVideoRotator>();
             services.AddSingleton<IMediaProcessor, MediaProcessor>();
+            services.AddSingleton<IRotationDescriptionDeterminer, FfmpegRotationDescriptionDeterminer>();
+            services.AddSingleton<IReplyBuilder, RedditReplyBuilder>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();
 

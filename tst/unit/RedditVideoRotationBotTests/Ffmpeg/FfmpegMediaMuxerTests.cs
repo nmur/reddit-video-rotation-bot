@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using RedditVideoRotationBot;
 using FakeItEasy;
 using RedditVideoRotationBot.Interfaces;
 using System.IO;
@@ -7,8 +6,9 @@ using System;
 using System.Text;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
+using RedditVideoRotationBot.Media.Ffmpeg;
 
-namespace RedditVideoRotationBotTests
+namespace RedditVideoRotationBotTests.Ffmpeg
 {
     public class FfmpegMediaMuxerTests : IDisposable
     {

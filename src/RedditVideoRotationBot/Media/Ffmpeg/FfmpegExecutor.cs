@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Media.Ffmpeg
 {
 
     [ExcludeFromCodeCoverage]

@@ -1,6 +1,6 @@
 ﻿using RedditVideoRotationBot.Interfaces;
 
-namespace RedditVideoRotationBot
+namespace RedditVideoRotationBot.Reddit
 {
     public class RedditHelper
     {
