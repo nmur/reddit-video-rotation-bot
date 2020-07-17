@@ -55,6 +55,7 @@ namespace RedditVideoRotationBot
             services.AddSingleton<IMediaMuxer, FfmpegMediaMuxer>();
             services.AddSingleton<IVideoRotator, FfmpegVideoRotator>();
             services.AddSingleton<IMediaProcessor, MediaProcessor>();
+            services.AddSingleton<IRotationDescriptionDeterminer, FfmpegRotationDescriptionDeterminer>();
             services.AddSingleton<IReplyBuilder, RedditReplyBuilder>();
             services.AddSingleton<IRedditMessageHandler, RedditMessageHandler>();
             services.AddSingleton<IRedditClientWrapper, RedditClientWrapper>();

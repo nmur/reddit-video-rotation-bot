@@ -16,7 +16,6 @@ namespace RedditVideoRotationBot
 
         private const string UsernameMentionSubjectString = "username mention";
 
-
         public RedditMessageHandler(IRedditClientWrapper redditClientWrapper, IMediaProcessor mediaProcessor, IReplyBuilder replyBuilder)
         {
             _redditClientWrapper = redditClientWrapper;
@@ -77,7 +76,7 @@ namespace RedditVideoRotationBot
             ReplyToComment(message, _replyBuilder.BuildReply(new ReplyBuilderParameters
             {
                 UploadedVideoUrl = uploadedVideoUrl,
-                RotationDescription = rotationArgument
+                RotationMessageArg = rotationArgument
             }));
         }
 

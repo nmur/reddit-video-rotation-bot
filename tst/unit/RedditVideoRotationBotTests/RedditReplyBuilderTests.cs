@@ -3,6 +3,7 @@ using Xunit;
 using static FluentAssertions.FluentActions;
 using FluentAssertions;
 using RedditVideoRotationBot.Exceptions;
+using RedditVideoRotationBot.Interfaces;
 
 namespace RedditVideoRotationBotTests
 {
@@ -20,19 +21,27 @@ namespace RedditVideoRotationBotTests
 
         private const string RotationDescription = "90° clockwise";
 
+        private const string RotationMessageArg = "cw";
+
+        private readonly IReplyBuilder _redditReplyBuilder;
+
+        public RedditReplyBuilderTests()
+        {
+            _redditReplyBuilder = new RedditReplyBuilder(new FfmpegRotationDescriptionDeterminer());
+        }
+
         [Fact]
-        public void GivenUploadedVideoUrlAndRotationDescription_WhenRedditReplyIsBuilt_ThenRedditReplyIsReturnedSuccessfully()
+        public void GivenUploadedVideoUrlAndRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyIsReturnedSuccessfully()
         {
             // Arrange
-            var redditReplyBuilder = new RedditReplyBuilder();
             var replyBuilderParameters = new ReplyBuilderParameters
             {
                 UploadedVideoUrl = UploadedVideoUrl,
-                RotationDescription = RotationDescription
+                RotationMessageArg = RotationMessageArg
             };
 
             // Act
-            var reply = redditReplyBuilder.BuildReply(replyBuilderParameters);
+            var reply = _redditReplyBuilder.BuildReply(replyBuilderParameters);
 
             // Assert
             Assert.Equal(CompletedReply, reply);
@@ -41,36 +50,34 @@ namespace RedditVideoRotationBotTests
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void GivenAnInvalidUploadedVideoUrlAndValidRotationDescription_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
+        public void GivenAnInvalidUploadedVideoUrlAndValidRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
         {
             // Arrange
-            var redditReplyBuilder = new RedditReplyBuilder();
             var replyBuilderParameters = new ReplyBuilderParameters
             {
                 UploadedVideoUrl = invalidUrl,
-                RotationDescription = RotationDescription
+                RotationMessageArg = RotationMessageArg
             };
 
             // Act + Assert
-            Invoking(() => redditReplyBuilder.BuildReply(replyBuilderParameters))
+            Invoking(() => _redditReplyBuilder.BuildReply(replyBuilderParameters))
                 .Should().Throw<RedditReplyBuilderException>();
         }
 
         [Theory]
         [InlineData("")]
         [InlineData(null)]
-        public void GivenValidUploadedVideoUrlAndInvalidRotationDescription_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidRotationDescription)
+        public void GivenValidUploadedVideoUrlAndInvalidRotationMessageArg_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidRotationMessageArg)
         {
             // Arrange
-            var redditReplyBuilder = new RedditReplyBuilder();
             var replyBuilderParameters = new ReplyBuilderParameters
             {
                 UploadedVideoUrl = UploadedVideoUrl,
-                RotationDescription = invalidRotationDescription
+                RotationMessageArg = invalidRotationMessageArg
             };
 
             // Act + Assert
-            Invoking(() => redditReplyBuilder.BuildReply(replyBuilderParameters))
+            Invoking(() => _redditReplyBuilder.BuildReply(replyBuilderParameters))
                 .Should().Throw<RedditReplyBuilderException>();
         }
     }

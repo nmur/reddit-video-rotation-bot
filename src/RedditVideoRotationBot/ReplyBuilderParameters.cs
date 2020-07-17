@@ -4,6 +4,6 @@
     {
         public string UploadedVideoUrl;
 
-        public string RotationDescription;
+        public string RotationMessageArg;
     }
 }

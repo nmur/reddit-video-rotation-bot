@@ -13,11 +13,21 @@ namespace RedditVideoRotationBot
 
         private const string PmUrl = "https://www.reddit.com/message/compose/?to=nmur";
 
+        private readonly IRotationDescriptionDeterminer _rotationDescriptionDeterminer;
+
+        public RedditReplyBuilder(IRotationDescriptionDeterminer rotationDescriptionDeterminer)
+        {
+            _rotationDescriptionDeterminer = rotationDescriptionDeterminer;
+        }
+
         public string BuildReply(ReplyBuilderParameters replyBuilderParameters)
         {
             ValidateParameters(replyBuilderParameters);
 
-            return string.Format(ReplyTemplate, replyBuilderParameters.RotationDescription, replyBuilderParameters.UploadedVideoUrl);
+            return string.Format(
+                ReplyTemplate,
+                _rotationDescriptionDeterminer.GenerateRotationDescriptionMessageArgArgument(replyBuilderParameters.RotationMessageArg),
+                replyBuilderParameters.UploadedVideoUrl);
         }
 
         private static void ValidateParameters(ReplyBuilderParameters replyBuilderParameters)
@@ -25,7 +35,7 @@ namespace RedditVideoRotationBot
             if (string.IsNullOrEmpty(replyBuilderParameters.UploadedVideoUrl))
                 throw new RedditReplyBuilderException("Uploaded video URL was either null or empty");
 
-            if (string.IsNullOrEmpty(replyBuilderParameters.RotationDescription))
+            if (string.IsNullOrEmpty(replyBuilderParameters.RotationMessageArg))
                 throw new RedditReplyBuilderException("Rotation description was either null or empty");
         }
     }
