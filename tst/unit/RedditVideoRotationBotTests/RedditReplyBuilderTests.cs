@@ -1,5 +1,7 @@
 ﻿using RedditVideoRotationBot;
 using Xunit;
+using static FluentAssertions.FluentActions;
+using FluentAssertions;
 
 namespace RedditVideoRotationBotTests
 {
@@ -26,6 +28,19 @@ namespace RedditVideoRotationBotTests
 
             // Assert
             Assert.Equal(CompletedReply, reply);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public void GivenAnInvalidUploadedVideoUrl_WhenRedditReplyIsBuilt_ThenRedditReplyBuilderExceptionIsThrown(string invalidUrl)
+        {
+            // Arrange
+            var redditReplyBuilder = new RedditReplyBuilder();
+
+            // Act + Assert
+            Invoking(() => redditReplyBuilder.BuildReply(invalidUrl))
+                .Should().Throw<RedditReplyBuilderException>();
         }
     }
 }
