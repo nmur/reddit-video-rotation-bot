@@ -58,6 +58,7 @@ namespace RedditVideoRotationBot.Reddit
 
         private async Task RotateAndUploadVideo(Message message)
         {
+            Console.WriteLine($"Processing message: {message.Fullname}...");
             var rotationArgument = GetRotationArgument(message);
 
             var post = GetCommentRootPost(message);
