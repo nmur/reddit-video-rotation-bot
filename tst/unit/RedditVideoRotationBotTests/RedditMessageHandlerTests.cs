@@ -202,6 +202,21 @@ namespace RedditVideoRotationBotTests
         }
 
         [Fact]
+        public async Task GivenRedditMessageHandler_WhenReplyBuildingFails_ThenCommentWasNotRepliedToAndCommentWasMarkedRead()
+        {
+            // Arrange
+            var messagesUpdateEventArgs = GetMessagesUpdateEventArgsWithOneUsernameMentionMessage();
+            A.CallTo(() => _fakeReplyBuilder.BuildReply(A<string>._)).Throws<RedditReplyBuilderException>();
+
+            // Act
+            await _redditMessageHandler.OnUnreadMessagesUpdated(new object(), messagesUpdateEventArgs);
+
+            // Assert
+            AssertNumberOfReadMessages(1);
+            AssertNumberOfRepliedToComments(0);
+        }
+
+        [Fact]
         public async Task GivenRedditMessageHandler_WhenOnUnreadMessagesUpdatedIsCalledWithUsernameMentionWithNoRotationArgument_ThenNoVideoIsProcessedAndCommentWasMarkedRead()
         {
             // Arrange
