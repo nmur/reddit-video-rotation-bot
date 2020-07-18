@@ -6,7 +6,7 @@ A summonable Reddit bot that rotates videos.
 ## Usage
 In a Reddit video post, create a reply with a user mention of the bot (currently [/u/video-rotator](https://www.reddit.com/user/video-rotator)), followed by the requested rotation.
 
-For example, to request a video to be rotated clockwise 90°:  
+For example, to request a video to be rotated 90° clockwise:  
 > /u/video-rotator cw  
 
 Other usage instructions, as well as a full list of rotational parameters can be found [here](https://github.com/nmur/reddit-video-rotation-bot/wiki/Detailed-usage-instructions).  
