@@ -1,4 +1,4 @@
-[![CircleCI](https://img.shields.io/circleci/build/github/nmur/reddit-video-rotation-bot)](https://circleci.com/gh/nmur/reddit-video-rotation-bot) [![Coverage Status](https://coveralls.io/repos/github/nmur/reddit-video-rotation-bot/badge.svg?branch=master)](https://coveralls.io/github/nmur/reddit-video-rotation-bot?branch=master) [![Docker Pulls](https://img.shields.io/docker/pulls/nmur/reddit-video-rotation-bot)](https://hub.docker.com/r/nmur/reddit-video-rotation-bot) 
+[![CircleCI](https://img.shields.io/circleci/build/github/nmur/reddit-video-rotation-bot)](https://circleci.com/gh/nmur/reddit-video-rotation-bot) [![Coverage Status](https://img.shields.io/coveralls/github/nmur/reddit-video-rotation-bot)](https://coveralls.io/github/nmur/reddit-video-rotation-bot?branch=master) [![Docker Pulls](https://img.shields.io/docker/pulls/nmur/reddit-video-rotation-bot)](https://hub.docker.com/r/nmur/reddit-video-rotation-bot) 
 
 # reddit-video-rotation-bot
 A summonable Reddit bot that rotates videos.
