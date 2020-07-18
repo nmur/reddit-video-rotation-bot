@@ -6,7 +6,8 @@ jobs:
       - checkout
       - run: docker build .
   coverage:
-    machine: true
+    docker:
+      - image: mcr.microsoft.com/dotnet/core/sdk:3.1
     steps:
       - checkout
       - run: dotnet tool install coveralls.net --version 1.0.0 --tool-path tools
