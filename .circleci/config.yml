@@ -10,7 +10,7 @@ jobs:
       - image: mcr.microsoft.com/dotnet/core/sdk:3.1
     steps:
       - checkout
-      - run: dotnet tool install coveralls.net --version 1.0.0 --tool-path tools
+      - run: dotnet tool install coveralls.net --version 2.0.0-beta0002 --tool-path tools
       - run: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput='../../../TestResults/'
       - run: ./tools/csmacnz.Coveralls --opencover -i ./TestResults/coverage.opencover.xml --commitId $CIRCLE_SHA1 --commitBranch $CIRCLE_BRANCH
       
