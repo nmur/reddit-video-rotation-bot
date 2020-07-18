@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RedditVideoRotationBot.Exceptions
 {
+    [ExcludeFromCodeCoverage]
     public class RedditPostParserException : Exception
     {
         public RedditPostParserException()

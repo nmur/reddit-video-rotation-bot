@@ -1,7 +1,9 @@
 ﻿using RedditVideoRotationBot.Interfaces;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RedditVideoRotationBot.Configurations
 {
+    [ExcludeFromCodeCoverage]
     public class GfyCatApiConfiguration : IGfyCatApiConfiguration
     {
         private readonly string ClientId;

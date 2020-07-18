@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Refit;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace RedditVideoRotationBot.Interfaces
@@ -19,6 +20,7 @@ namespace RedditVideoRotationBot.Interfaces
         Task<GfyResponse> GetGfy(string gfyName);
     }
 
+    [ExcludeFromCodeCoverage]
     public class GfyCatCredentials
     {
         [JsonProperty("grant_type")]
@@ -30,6 +32,8 @@ namespace RedditVideoRotationBot.Interfaces
         [JsonProperty("client_secret")]
         public string ClientSecret { get; set; }
     }
+
+    [ExcludeFromCodeCoverage]
     public class GfyCatCreationParameters
     {
         [JsonProperty("keepAudio")]
